@@ -15,6 +15,11 @@ import java.util.List;
  * @author andre
  */
 public class NPromocion {
+    
+    
+             
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","DESCRIPCION","DESCUENTO","FECHA DE INICIO","FECHA FIN","ID_SERVICIO"};
     DPromocion dpromocion;
     DPersonal dpersonal;
     
@@ -26,9 +31,9 @@ public class NPromocion {
      public void registrarPromocion(List<String> parametros, String correo) throws SQLException, ParseException {
         
         if (parametros.size() == 6){
-           int personalid = dpersonal.getIdByCorreo(correo);// validamos q un personal 
+           
             
-            if(personalid != -1) {
+            
               dpromocion.guardar(parametros.get(0),//nombre
                                  parametros.get(1),//descripcion
                                  Float.parseFloat(parametros.get(2)),//descuento
@@ -37,18 +42,18 @@ public class NPromocion {
                                  parametros.get(5));//fecha fin
                                 
                 dpromocion.Disconnect();
-            }
+            
         }else{
             throw new IndexOutOfBoundsException();
         }
-          dpromocion.Disconnect();
+           dpromocion.Disconnect();
     }
      public void editarPromocion(List<String> parametros, String correo) throws SQLException, ParseException {
             
         if (parametros.size() == 7){
-           int personalid = dpersonal.getIdByCorreo(correo);// validamos q un personal 
+          
             
-            if(personalid != -1) {
+            
               dpromocion.editar(Integer.parseInt(parametros.get(0)),
                                 parametros.get(1),//nombre
                                 parametros.get(2),//descripcion
@@ -58,7 +63,7 @@ public class NPromocion {
                                 parametros.get(6));//fecha fin
                                 
                 dpromocion.Disconnect();
-            }
+            
         }else{
             throw new IndexOutOfBoundsException();
         }

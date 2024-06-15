@@ -16,8 +16,7 @@ import java.util.List;
  * @author mmach
  */
 public class DRol {
-    public static final String[] HEADERS =
-        {"ID","NOMBRE","DESCRIPCION"};
+    
     
     private final sqlconnection connection;
     
@@ -79,7 +78,7 @@ public class DRol {
                     "No se pudo eliminar el rol en la base de datos -> eliminar().");
             throw new SQLException();
         }else{
-            System.err.println("Rol modificado correctamente en la base de datos.");
+            System.err.println("Rol eliminado correctamente en la base de datos.");
         }
     }
     

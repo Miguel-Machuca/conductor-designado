@@ -28,8 +28,8 @@ public class MailVerificationThread implements Runnable{
     
     private final static int PORT = 110;
     private final static String HOST = "mail.tecnoweb.org.bo";
-    private final static String USER = "grupo13sa";
-    private final static String PASSWORD = "grup013grup013";
+    private final static String USER = "grupo04sc";
+    private final static String PASSWORD = "grup004grup004";
     
     private Socket socket;
     private BufferedReader input;
@@ -76,14 +76,14 @@ public class MailVerificationThread implements Runnable{
                 input.close();
                 output.close();
                 socket.close();
-                System.out.println("**************** Conexion cerrada ****************");
+                System.out.println("**************** Conexion cerrada ********************");
                 
                 if(count > 0) {
                     //System.out.println("ENtraditaaaaaaaaaaaaaaaa");
                    emailEventListener.onReceiveEmailEvent(emails);
                 }
                 
-                Thread.sleep(10000);
+                Thread.sleep(5000);
                 
             } catch (IOException ex) {
                 Logger.getLogger(MailVerificationThread.class.getName()).log(Level.SEVERE, null, ex);

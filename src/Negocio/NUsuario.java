@@ -20,7 +20,10 @@ import java.util.logging.Logger;
  */
 public  class NUsuario {
     
-      private final DUsuario dUsuario;
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","TIPO DE USUARIO"};
+      
+    private final DUsuario dUsuario;
       
     public NUsuario() {
         dUsuario = new DUsuario();
@@ -90,24 +93,20 @@ public  class NUsuario {
 
     public boolean esUsuario(String correo) throws SQLException {
         try {
-            return dUsuario.esUsuario(correo);
+            return dUsuario.getIdByCorreo(correo)!=-1;
         } catch (SQLException e) {
             // Logging del error
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al verificar si el usuario existe", e);            
             throw e;
         }
     }
-
-     
-    public boolean esAdmin(String correo) throws SQLException {
-        try {
-            return dUsuario.esAdmin(correo);
-        } catch (SQLException e) {
-            // Logging del error
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al verificar si el usuario es admin", e);
-            throw e;
-        }
+    public int getRolbyCorreo(String correo) throws SQLException{
+        
+        return dUsuario.getIdRolByCorreo(correo);
+        
     }
+     
+    
 
    
 }

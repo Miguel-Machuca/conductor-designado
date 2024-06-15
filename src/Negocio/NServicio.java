@@ -15,6 +15,11 @@ import java.util.List;
  * @author andre
  */
 public class NServicio {
+    
+    
+     
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","DESCRIPCION"};
     DServicio dservicio;
     DPersonal dpersonal;
     public NServicio(){
@@ -24,13 +29,11 @@ public class NServicio {
      public void RegistrarServicio(List<String> parametros, String correo) throws SQLException, ParseException {
         
         if (parametros.size() == 2){
-           int personalid = dpersonal.getIdByCorreo(correo);// validamos q un personal 
             
-            if(personalid != -1) {
               dservicio.guardar(parametros.get(0),//nombre
                                  parametros.get(1));//descripcion
                 dservicio.Disconnect();
-            }
+            
         }else{
             throw new IndexOutOfBoundsException();
         }
@@ -39,14 +42,14 @@ public class NServicio {
     
     public void editarServcio(List<String> parametros, String correo) throws SQLException, ParseException {
             if (parametros.size() == 3){
-           int personalid = dpersonal.getIdByCorreo(correo);// validamos q un personal 
+          
             
-            if(personalid != -1) {
+          
               dservicio.editar(Integer.parseInt(parametros.get(0)),//id
                                 parametros.get(1),//nombre
                                 parametros.get(2));//descripcion
                 dservicio.Disconnect();
-            }
+            
         }else{
             throw new IndexOutOfBoundsException();
         }

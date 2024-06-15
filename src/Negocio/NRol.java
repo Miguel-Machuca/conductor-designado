@@ -16,6 +16,8 @@ import java.util.List;
  * @author andre
  */
 public class NRol {
+      public static final String[] HEADERS =
+        {"ID","NOMBRE","DESCRIPCION"};
       private final DRol drol;
       
     public NRol() {

@@ -58,15 +58,15 @@ public class Main {
         String comando11 = "personal editar [13, Andrea editado , chavez , Andrea@gmail.com,   12345678,63489070, 1998-06-21, femenino,2500.7,activo,empleado] ";
         String comando12 = "personal eliminar [14] ";
              
-        String comando13 = "rol agregar [ admin, super usuario] ";
+        String comando13 = "rol agregar [ a,b] ";
         String comando14 = "rol editar [ 2,conductor, es un conductor de la empresa] ";
         String comando15 = "rol eliminar [ 1] ";
 
-        String comando16 = "gastosOperativos agregar[120.3,2024-10-15,pago de almuerzos, 5]";
-        String comando17 = "gastosOperativos editar[6, 122.3,2024-09-12,pago de biaticos editado, 5 ]";
+        String comando16 = "gastosOperativos agregar[120.3,2024-10-15,pago de almuerzos]";
+        String comando17 = "gastosOperativos editar[6, 122.3,2024-09-12,pago de biaticos editado]";
         String comando18 = "gastosOperativos eliminar[1 ]";
         
-        String comando19 = "vehiculo agregar [Audi,A4,Bol123,5367272,2028-08-22,activo,erika@gmail.com]";
+        String comando19 = "vehiculo agregar [Audi, A4, Bol123, 5367272, 2028-08-22, activo, luisfelipe.lfgo59@gmail.com]";
         String comando20 = "vehiculo editar [1,Audi,A4,Bol123,5367272,2028-08-22,activo,juan@gmail.com]";
         String comando21 = "vehiculo eliminar [1]";
         
@@ -78,9 +78,7 @@ public class Main {
         String comando26 = "promocion editar [1,dia de la madre , promocion por el dia de la madre, 0.15,   1   ,  2024-05-01,  2024-05-30]";
         String comando27 = "promocion eliminar [1]";
         
-        String comando28 = "reserva agregar   [1, https://maps.app.goo.gl/kL8J44qZz8xNASSL6,2024-06-4 19:41:00]";
-        String comando29 = "solicitar agregar [1, https://maps.app.goo.gl/2Ck75XWJ4tTEcVrW9,2024-06-5 29:41:00]";
-        
+      
         String comando30 = "metodoDePago agregar[Tarjeta de credito, 637828293,banco BNB,2025-07-09,7865]";
         //String comando30 = "metodoDePago agregar[Efectivo]";
         String comando31 = "metodoDePago editar[1,Tarjeta de credito, 637828293,banco union editado ,2025-07-09,7865]";
@@ -88,47 +86,157 @@ public class Main {
         
         String comando33 = "usuario editar [5, 4] ";
         String comando34 = "conductor editar [15, libre]";
+        String comando29 = "solicitar agregar [1, https://maps.app.goo.gl/2Ck75XWJ4tTEcVrW9,2024-06-5 29:41:00]";
+        
+          
+        String comando28 = "viaje solicitar   [1, https://maps.app.goo.gl/kL8J44qZz8xNASSL6]";// cliente solicita un viaje
+        String comando = "viaje aceptar   [1]";//codigo del viajes "id_solicitud"-->conductor avisa que esta en camino
+        String comando55 = "viaje pagar   [111,1]";//codigo del viajes "id_solicitud" y el metodo de pago
+        
+        
+        
+        
         
         String correo = "miguel@gmail.com";
-        Interpreter interpreter = new Interpreter(comando28, correo);       
+        Interpreter interpreter = new Interpreter(comando4, correo);       
         interpreter.setListener(new ITokenEventListener() {
+            
+            @Override
+            public void viajes(TokenEvent event) {
+                
+                System.out.println("cantidad de parametros:    "+event.countParams());
+                System.out.println(event.toString());
+                try {
+                    switch (event.getAction()){
+                        
+                        case Token.SOLICITAR: 
+                            System.out.println("entramos a agregar reserva ");
+                            
+                            int idSolicitud = solicitud.idRegistrarSolicitud(event.getParams(), event.getSender());
+                            
+                            int idConductor = solicitud.idBuscarConductor(idSolicitud);
+                            
+                            System.out.println(conductor.getCorreoById(idConductor));
+                           
+                            //solicitud.reservarSolicitud(event.getParams(),event.getSender());
+                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
+                           List<String[]> p = new ArrayList<>();
+                            String[] data = {String.valueOf(idSolicitud), String.valueOf(solicitud.getTarifa()),event.getParams(2)};//id_solicitud,tarifa del viaje, ruta
+                                    p.add(data);
+                            break;
+                         
+                    }
+                    
+                } catch (SQLException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+             //*****************************************************************************************    
+        // *******************************   RESERVAR SERVICIO  ********************************************
+        //*****************************************************************************************       
+            @Override
+            public void reservas(TokenEvent event) {
+                
+                System.out.println("cantidad de parametros:    "+event.countParams());
+                System.out.println(event.toString());
+                try {
+                    switch (event.getAction()){
+                        
+                        case Token.AGREGAR: 
+                            System.out.println("entramos a agregar reserva ");
+                            
+                            int idSolicitud = solicitud.idRegistrarSolicitud(event.getParams(), event.getSender());
+                            
+                            int idConductor = solicitud.idBuscarConductor(idSolicitud);
+                            
+                            System.out.println(conductor.getCorreoById(idConductor));
+                            
+                            //solicitud.reservarSolicitud(event.getParams(),event.getSender());
+                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
+                           
+                           // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
+                            break;
+                        case Token.LISTAR:
+                           // 
+                        break; 
+                        case Token.VER:
+                           //
+                        break;
+                       
+                    }
+                    
+                } catch (SQLException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            
+            
+            
         //*****************************************************************************************    
         // *******************************   ROL    *********************************************
         //*****************************************************************************************
-            @Override
+           @Override
             public void roles(TokenEvent event) {
-                System.out.println("cantidad de parametros: " + event.countParams());
-                System.out.println(event.toString());
-
+               
+               String Correo=event.getSender();
+                     
                 try {
-                    String correo = event.getSender(); // Asume que el correo del usuario se obtiene del evento
-                    if (usuario.esUsuario(correo) && usuario.esAdmin(correo)) {
-                        switch (event.getAction()) {
-                            case Token.AGREGAR:
-                                rol.guardarRol(event.getParams());
-                                // simpleNotifySuccess(event.getSender(), "Rol guardado correctamente");
-                                break;
-                            case Token.EDITAR:
-                                rol.editarRol(event.getParams());
-                                break;
-                            case Token.ELIMINAR:
-                                rol.eliminarRol(event.getParams());
-                                break;
-                            case Token.LISTAR:
-                                // usuario.listarUsuarios();
-                                break;
-                            case Token.VER:
-                                break;
+                    int a =usuario.getRolbyCorreo(Correo);
+                      System.out.println("id admin :"+ a);
+                  
+                    if ( usuario.esUsuario(Correo)){//validamos que sea un usuario del sistema 
+                        System.out.println("id admin :"+usuario.getRolbyCorreo(Correo));
+                        if(usuario.getRolbyCorreo(Correo)==4){// validamos que sea admin
+                            
+                            switch (event.getAction()){
+                       
+                                    case Token.AGREGAR: 
+                                        rol.guardarRol(event.getParams());
+
+                                        break;
+                                    case Token.EDITAR:
+                                        rol.editarRol(event.getParams());
+                                        break;
+                                    case Token.ELIMINAR:
+                                        rol.eliminarRol(event.getParams());
+                                        break;
+                                    case Token.LISTAR:
+
+                                       break;
+                                    case Token.VER:
+                                        break;
+
+                                    }
+                        }else{
+                            
                         }
-                    } else {
-                        System.out.println("Acción no permitida: El usuario no es administrador.");
-                    }
+                        
+                  }else{
+                       
+                   }
+                  
                 } catch (SQLException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error SQL", ex);
+                    
+                       
+                        
                 } catch (ParseException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error de parseo", ex);
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error desconocido", ex);
+                    
+                        
+                        
+                }
+                  catch (IndexOutOfBoundsException ex) {
+                      
+                       
                 }
             }
             
@@ -357,46 +465,7 @@ public class Main {
                 }
             }
             
-        //*****************************************************************************************    
-        // *******************************   RESERVAR SERVICIO  ********************************************
-        //*****************************************************************************************       
-            @Override
-            public void reservas(TokenEvent event) {
-                
-                System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
-                try {
-                    switch (event.getAction()){
-                        
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar reserva ");
-                            
-                            int idSolicitud = solicitud.idRegistrarSolicitud(event.getParams(), event.getSender());
-                            int idConductor = solicitud.idBuscarConductor(idSolicitud);
-                            System.out.println(conductor.getCorreoById(idConductor));
-                            
-                            //solicitud.reservarSolicitud(event.getParams(),event.getSender());
-                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
-                           
-                           // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.LISTAR:
-                           // 
-                        break; 
-                        case Token.VER:
-                           //
-                        break;
-                       
-                    }
-                    
-                } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+       
             
          //*****************************************************************************************    
         // *******************************   SOLICITAR SERVICIO  ********************************************
@@ -530,10 +599,7 @@ public class Main {
                 System.out.println("error de comando");    
             }
 
-            @Override
-            public void viajes(TokenEvent event) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+            
         //*****************************************************************************************    
         // *******************************   METODO DE PAGO ********************************************
         //*****************************************************************************************
@@ -569,6 +635,11 @@ public class Main {
                 } catch (ParseException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+
+            @Override
+            public void ayuda(TokenEvent event) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
 
  

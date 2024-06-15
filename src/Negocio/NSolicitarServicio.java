@@ -26,11 +26,15 @@ import java.util.logging.Logger;
  * @author andre
  */
 public class NSolicitarServicio {
+    
+    public static final String[] HEADERS =
+        {"COD.","TARIFA","RUTA"};
+    
     DCliente dcliente ;
     DConductor dConductor;
     DSolicitarServicio dSolicitarServicio;
     DServicio dservicio;
-    public final float CostoReserva=(float) 0.002;//borrar luego
+   // public final float CostoReserva=(float) 0.002;//borrar luego
     private static final double R = 6371;
     private static double Tarifa ;
     
@@ -84,9 +88,10 @@ public class NSolicitarServicio {
                                             coords[0],//origen
                                             coords[1],// destino
                                             //parametros.get(3),//tipo de servicio con o sin reserva
-                                     clienteid,//id cliente
-                                     servicioid,//id servicio                                       
-                                    conductor
+                                            clienteid,//id cliente
+                                            servicioid,//id servicio                                       
+                                            conductor,
+                                            shortUrl
                                             );
                 dSolicitarServicio.Disconnect();   
             }
@@ -96,11 +101,14 @@ public class NSolicitarServicio {
         //creartransaccion(idsolicitud,monto,idmetodo)
     }
     
+    
+    // estoy usando este para viajes sin reservas 
     public int idRegistrarSolicitud(List<String> parametros, String correo) throws SQLException, ParseException, Exception {
         int clienteid = dcliente.getIdByCorreo(correo);
         int servicioid = Integer.parseInt(parametros.get(0));
-        System.out.println("Entró aquí");
+       // System.out.println("Entró aquí");
         if (clienteid != -1 && dservicio.existeServicio(servicioid)) {
+            //System.out.println("paso la validacion");
             int conductor = elegirConductor();
             if (conductor != -1) {
                 String shortUrl = parametros.get(1);
@@ -128,7 +136,8 @@ public class NSolicitarServicio {
                                             coords[1],
                                             clienteid,
                                             servicioid,
-                                            conductor
+                                            conductor,
+                                            shortUrl
                                         );
                 dSolicitarServicio.Disconnect();
                 return idSolicitud;

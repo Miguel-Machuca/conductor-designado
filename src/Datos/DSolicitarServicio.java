@@ -45,8 +45,8 @@ public class DSolicitarServicio {
     }
     
     // solicitar servicio sin reserva
-    public void solicitarServicio(String fechaSolicitudStr,float costo, String origen, String destino, int idCliente, int idServicio, Object idConductor) throws SQLException {
-        String query = "INSERT INTO solicitar_servicio (fecha_solicitud, origen, destino, estado,tipo_servicio, id_cliente, id_servicio,costo_adicional, id_conductor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public void solicitarServicio(String fechaSolicitudStr,float costo, String origen, String destino, int idCliente, int idServicio, Object idConductor,String ruta) throws SQLException {
+        String query = "INSERT INTO solicitar_servicio (fecha_solicitud, origen, destino, estado,tipo_servicio, id_cliente, id_servicio,costo_adicional, id_conductor,ruta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
         // Convertir las cadenas de fecha a Timestamp
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Timestamp fechaSolicitud = Timestamp.valueOf(LocalDateTime.parse(fechaSolicitudStr, formatter));
@@ -65,6 +65,7 @@ public class DSolicitarServicio {
             ps.setInt(7, idServicio);
             ps.setFloat(8, costo);
             ps.setObject(9, idConductor);    // Utiliza setObject para permitir valores nulos
+            ps.setString(10, ruta);    // Utiliza setObject para permitir valores nulos
 
             if (ps.executeUpdate() == 0) {
                 System.err.println("Class DSolicitarServicio.java: Ocurrió un error al insertar una solicitud de servicio en guardar()");
@@ -77,12 +78,12 @@ public class DSolicitarServicio {
         }
     }
     
-    public void solicitarServicio(String fechaSolicitudStr, float costo, String origen, String destino, int idCliente, int idServicio) throws SQLException {        
+   /* public void solicitarServicio(String fechaSolicitudStr, float costo, String origen, String destino, int idCliente, int idServicio) throws SQLException {        
         solicitarServicio(fechaSolicitudStr, costo, origen, destino, idCliente, idServicio, null);
     }
-    
-    public int idSolicitarServicio(String fechaSolicitudStr, float costo, String origen, String destino, int idCliente, int idServicio, Object idConductor) throws SQLException {
-        String query = "INSERT INTO solicitar_servicio (fecha_solicitud, origen, destino, estado, tipo_servicio, id_cliente, id_servicio, costo_adicional, id_conductor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    */
+    public int idSolicitarServicio(String fechaSolicitudStr, float costo, String origen, String destino, int idCliente, int idServicio, Object idConductor,String ruta) throws SQLException {
+        String query = "INSERT INTO solicitar_servicio (fecha_solicitud, origen, destino, estado, tipo_servicio, id_cliente, id_servicio, costo_adicional, id_conductor,ruta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
         // Convertir las cadenas de fecha a Timestamp
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Timestamp fechaSolicitud = Timestamp.valueOf(LocalDateTime.parse(fechaSolicitudStr, formatter));
@@ -99,7 +100,8 @@ public class DSolicitarServicio {
             ps.setInt(7, idServicio);
             ps.setFloat(8, costo);
             ps.setObject(9, idConductor);     // Utiliza setObject para permitir valores nulos
-
+            ps.setString(10, ruta);
+            
             int affectedRows = ps.executeUpdate();
 
             if (affectedRows == 0) {

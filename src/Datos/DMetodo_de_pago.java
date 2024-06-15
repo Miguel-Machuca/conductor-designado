@@ -89,27 +89,31 @@ public class DMetodo_de_pago {
         }
     }
 
-    public List<String[]> listar() throws SQLException {
-        List<String[]> metodosPago = new ArrayList<>();
-        String query = "SELECT * FROM metodo_de_pago";
-        PreparedStatement ps = connection.connect().prepareStatement(query);
-        ResultSet rs = ps.executeQuery();
+    public List<String[]> listar(int idcliente) throws SQLException {
+    List<String[]> metodosPago = new ArrayList<>();
+    String query = "SELECT * FROM metodo_de_pago WHERE id_cliente = ?";
+    PreparedStatement ps = connection.connect().prepareStatement(query);
+    ps.setInt(1, idcliente);
+    ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            String[] metodoPago = {
-                String.valueOf(rs.getInt("id")),
-                rs.getString("tipo_de_metodo_de_pago"),
-                rs.getString("numero_tarjeta"),
-                rs.getString("nombre_en_la_tarjeta"),
-                rs.getString("fecha_vencimiento"),
-                rs.getString("cvv_cvc"),
-                String.valueOf(rs.getInt("id_cliente"))
-            };
-            metodosPago.add(metodoPago);
-        }
-
-        return metodosPago;
+    while (rs.next()) {
+        String[] metodoPago = {
+            String.valueOf(rs.getInt("id")),
+            rs.getString("tipo_de_metodo_de_pago"),
+            rs.getString("numero_tarjeta"),
+            rs.getString("nombre_en_la_tarjeta"),
+            rs.getString("fecha_vencimiento"),
+            rs.getString("cvv_cvc"),
+            String.valueOf(rs.getInt("id_cliente"))
+        };
+        metodosPago.add(metodoPago);
     }
+
+    rs.close();
+    ps.close();
+
+    return metodosPago;
+}
 
     public String[] ver(int id) throws SQLException {
         String[] metodoPago = null;

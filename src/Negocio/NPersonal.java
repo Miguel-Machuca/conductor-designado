@@ -16,7 +16,11 @@ import java.util.List;
  * @author andre
  */
 public class NPersonal {
-     private final DPersonal dpersonal;
+    
+     
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","SALARIO","CARGO","ESTADO"};
+    private final DPersonal dpersonal;
       
     public NPersonal() {
         dpersonal = new DPersonal();

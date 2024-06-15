@@ -22,8 +22,7 @@ import java.sql.Connection;
  * @author andre
  */
 public class DUsuario {
-    public static final String[] HEADERS =
-        {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","TIPO DE USUARIO"};
+   
     private final  sqlconnection connection;
 
     public DUsuario() {
@@ -173,76 +172,25 @@ public class DUsuario {
         
         ResultSet set = ps.executeQuery();
         if (set.next()){
-            id = set.getInt(id);
+            id = set.getInt("id");
         }
         return id;
     }
     
-    //revisar  y validar 
-    /*
-     public int getIdRolByCorreo(String correo) throws SQLException{
+    
+    
+    
+    public int getIdRolByCorreo(String correo) throws SQLException{
         int id = -1;
-        String query = "SELECT rol_id FROM usuario WHERE correo=? AND condicion=0";
+        String query = "SELECT id_rol FROM usuario WHERE correo=? ";
         PreparedStatement ps = connection.connect().prepareStatement(query);
         ps.setString(1, correo);
         
         ResultSet set = ps.executeQuery();
         while(set.next()){
-            id = set.getInt("rol_id");
+            id = set.getInt("id_rol");
         }
         return id;
-    }
-*/
-
-    public boolean esUsuario(String correo) throws SQLException {
-        boolean existe = false;
-        String query = "SELECT 1 FROM usuario WHERE correo = ?";
-
-        try (Connection conn = connection.connect(); 
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setString(1, correo);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    existe = true;
-                }
-            }
-        } catch (SQLException e) {
-            // Logging del error
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al verificar la existencia del usuario por correo", e);
-            throw e;
-        }
-        return existe;
-    }
-    
-    public boolean esAdmin(String correo) throws SQLException {
-        boolean esAdmin = false;
-        String query = "SELECT r.nombre " +
-                       "FROM usuario u " +
-                       "JOIN rol r ON u.id_rol = r.id " +
-                       "WHERE u.correo = ?";
-
-        try (Connection conn = connection.connect(); 
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setString(1, correo);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String rolNombre = rs.getString("nombre");
-                    if ("admin".equals(rolNombre)) {
-                        esAdmin = true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            // Logging del error
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al verificar si el usuario es admin", e);
-            throw e;
-        }
-
-        return esAdmin;
     }
 
 }

@@ -17,6 +17,11 @@ import java.util.List;
  * @author andre
  */
 public class NVehiculo {
+    
+  
+            
+    public static final String[] HEADERS =
+        {"ID","MODELO","MARCA","PLACA","NUMERO DE SEGURO","FECHA DE VENCIMIENTO","ESTADO","ID_CONDUCTOR"};
     DVehiculo dvehiculo ;
     DPersonal dpersonal ;
     DConductor dConductor;
@@ -29,10 +34,10 @@ public class NVehiculo {
     public void RegistrarVehiculo(List<String> parametros, String correo) throws SQLException, ParseException {
         
         if (parametros.size() == 7){
-           int personalid = dpersonal.getIdByCorreo(correo);// validamos q un personal haga el registro de un vehiculo 
+           
            int conductorid = dConductor.getIdByCorreo(parametros.get(6));
            
-            if(personalid != -1) {
+            if(conductorid != -1) {
               dvehiculo.guardar(parametros.get(0),//modelo
                       parametros.get(1),//marca
                       parametros.get(2),// placa 

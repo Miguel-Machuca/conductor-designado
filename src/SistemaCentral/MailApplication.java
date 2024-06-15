@@ -4,8 +4,7 @@
  * and open the template in the editor.
  */
 package SistemaCentral;
-import Datos.DRol;
-import Datos.DUsuario;
+
 import Negocio.NCliente;
 import Negocio.NConductor;
 import Negocio.NGastosOperativos;
@@ -19,7 +18,7 @@ import Negocio.NUsuario;
 import Negocio.NVehiculo;
 import Utils.Email;
 import Utils.HtmlBuilder;
-import communication.MailVerificationThread;
+
 import interfaces.IEmailEventListener;
 import interpreter.Main;
 import interpreter.analex.Interpreter;
@@ -39,6 +38,7 @@ import java.util.ArrayList;
  * @author andre
  */
 public class MailApplication implements IEmailEventListener, ITokenEventListener{
+    
     private static final int CONSTRAINTS_ERROR = -2;
     private static final int NUMBER_FORMAT_ERROR = -3;
     private static final int INDEX_OUT_OF_BOUND_ERROR = -4;
@@ -61,12 +61,21 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
     private NSolicitarServicio solicitud;
     private NMetodo_de_pago metodo;
     
+    //Constructor
      public MailApplication() {
         mailVerificationThread = new MailVerificationThread();
         mailVerificationThread.setEmailEventListener(MailApplication.this);
         usuario = new NUsuario();
         cliente = new NCliente();
         rol = new NRol();
+        conductor = new NConductor();
+        personal = new NPersonal();
+        gastos = new NGastosOperativos();
+        vehiculo = new NVehiculo();
+        servicio = new NServicio();
+        promocion = new NPromocion();
+        solicitud = new NSolicitarServicio();
+        metodo = new NMetodo_de_pago();
     }
     
      //*****************************************************************************************    
@@ -75,35 +84,57 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
             @Override
             public void roles(TokenEvent event) {
                
-                System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+              
                 try {
-                    switch (event.getAction()){
-                        
-                        case Token.AGREGAR: 
-                            rol.guardarRol(event.getParams());
-                            simpleNotifySuccess(event.getSender(), "Rol guardado correctamente");
-                            
-                            break;
-                        case Token.EDITAR:
-                            rol.editarRol(event.getParams());
-                            break;
-                        case Token.ELIMINAR:
-                            rol.eliminarRol(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                            
-                           tableNotifySuccess(event.getSender(), "Lista de Roles", DRol.HEADERS, rol.listarRoles());
-                        break;
-                        case Token.VER:
-                            break;
-                       
-                    }
                     
+                    String Correo=event.getSender();
+                    if ( usuario.esUsuario(Correo)){//validamos que sea un usuario del sistema 
+                      
+                        if(usuario.getRolbyCorreo(Correo)==4){// validamos que sea admin
+                            
+                            switch (event.getAction()){
+                       
+                                    case Token.AGREGAR: 
+                                        rol.guardarRol(event.getParams());
+                                        simpleNotifySuccess(event.getSender(), "Rol guardado correctamente");
+
+                                        break;
+                                    case Token.EDITAR:
+                                        rol.editarRol(event.getParams());
+                                        simpleNotifySuccess(event.getSender(), "Rol Editado correctamente");
+                                        break;
+                                    case Token.ELIMINAR:
+                                        rol.eliminarRol(event.getParams());
+                                        simpleNotifySuccess(event.getSender(), "Rol Eliminado correctamente");
+                                        break;
+                                    case Token.LISTAR:
+
+                                       tableNotifySuccess(event.getSender(), "Lista de Roles", NRol.HEADERS, rol.listarRoles());
+                                       break;
+                                    case Token.VER:
+                                        break;
+
+                                    }
+                        }else{
+                            handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                        
+                  }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
+                   }
+                  
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                        
                 } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(PARSE_ERROR, event.getSender(), null);
+                        
+                }
+                  catch (IndexOutOfBoundsException ex) {
+                      
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
                 }
             }
             
@@ -113,36 +144,58 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
             @Override
             public void usuarios(TokenEvent event) {
                 
-                System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
                 try {
-                    switch (event.getAction()){
+                    String correo = event.getSender();
+                    
+                    if(usuario.esUsuario(correo)){
                         
-                        case Token.AGREGAR: 
-                            usuario.guardarUsuario(event.getParams());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                            usuario.editarUsuario(event.getParams());
-                            break;
-                        case Token.ELIMINAR:
-                            usuario.eliminarUsuario(event.getParams());
-                            break;
-                        case Token.LISTAR:
+                        if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
                             
-                            tableNotifySuccess(event.getSender(), "Lista de Usuarios", DUsuario.HEADERS, usuario.listarUsuarios());
+                             switch (event.getAction()){
+                        
+                                case Token.AGREGAR: 
+                                    usuario.guardarUsuario(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
+                                    break;
+                                case Token.EDITAR:
+                                    usuario.editarUsuario(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Usuario editado correctamente");
+                                    break;
+                                case Token.ELIMINAR:
+                                    usuario.eliminarUsuario(event.getParams());
+                                     simpleNotifySuccess(event.getSender(), "Usuario eliminado correctamente");
+                                    break;
+                                case Token.LISTAR:
+
+                                    tableNotifySuccess(event.getSender(), "Lista de Usuarios", NUsuario.HEADERS, usuario.listarUsuarios());
+
+                                    break;
+                                case Token.VER:
+                                    
+                                    break;
+
+                                }
                             
-                        break;
-                        case Token.VER:
-                            usuario.listarUsuarios();
-                            break;
-                       
+                        }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
                     }
+                   
                     
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                         handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                         
                 } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(PARSE_ERROR, event.getSender(), null);
+                        
+                }
+                catch (IndexOutOfBoundsException ex) {
+                      
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
                 }
             }
             
@@ -151,109 +204,185 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
         //*****************************************************************************************
              @Override
             public void clientes(TokenEvent event) {
-                 System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                
                 try {
-                    switch (event.getAction()){
+                    
+                    String correo = event.getSender();
+                    
+                    if(usuario.esUsuario(correo)){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar cliente ");
-                           cliente.guardarCliente(event.getParams());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                            cliente.editarCliente(event.getParams());
-                            break;
-                        case Token.ELIMINAR:
-                           cliente.eliminarCliente(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                           // cliente.listarUsuarios();
-                        break; 
-                        case Token.VER:
-                            //
-                            break;
-                       
+                        if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
+                            
+                           switch (event.getAction()){
+                        
+                                case Token.AGREGAR: 
+                                    
+                                    cliente.guardarCliente(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Cliente guardado correctamente");
+                                    break;
+                                case Token.EDITAR:
+                                    cliente.editarCliente(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Cliente editado correctamente");
+                                    break;
+                                case Token.ELIMINAR:
+                                    cliente.eliminarCliente(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Cliente eliminado correctamente");
+                                    break;
+                                case Token.LISTAR:
+                                    tableNotifySuccess(event.getSender(), "Lista de Clientes", NCliente.HEADERS, cliente.listarCliente());
+                                break; 
+                                case Token.VER:
+                                    //
+                                    break;
+
+                            }  
+                            
+                        }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
                     }
                     
+                   
+                    
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                         handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                         
                 } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                          handleError(PARSE_ERROR, event.getSender(), null);
+                          
                 }
+                 catch (IndexOutOfBoundsException ex) {
+          
+                         handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                 }
+                
             }
             
         //*****************************************************************************************    
         // *******************************   CONDUCTOR   ****************************************
         //*****************************************************************************************
              @Override
-            public void conductores(TokenEvent event) {
-                  System.out.println("cantidad de parametros:    "+event.countParams());
-                  System.out.println(event.toString());
-                try {
-                    switch (event.getAction()){
+        public void conductores(TokenEvent event) {
+                  
+            try {
+                String correo = event.getSender();
+
+                if(usuario.esUsuario(correo)){
+
+                    if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
+
+                        switch (event.getAction()){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar conductores ");
-                           conductor.guardarConductor(event.getParams());
-                           // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                            conductor.editarConductor(event.getParams());
-                            break;
-                        case Token.ELIMINAR:
-                           conductor.eliminarConductor(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                           // cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
+                            case Token.AGREGAR: 
+                                   
+                                conductor.guardarConductor(event.getParams());
+                                simpleNotifySuccess(event.getSender(), "Conductor Guardado correctamente");
+
+                                break;
+                            case Token.EDITAR:
+                                conductor.editarConductor(event.getParams());
+                                simpleNotifySuccess(event.getSender(), "Conductor Editado correctamente");
+
+                                break;
+                            case Token.ELIMINAR:
+                                conductor.eliminarConductor(event.getParams());
+                                simpleNotifySuccess(event.getSender(), "Conductor Eliminado correctamente");
+
+                                break;
+                            case Token.LISTAR:
+                                tableNotifySuccess(event.getSender(), "Lista de Conductores", NConductor.HEADERS, conductor.listarConductor());
+                                break; 
+                            case Token.VER:
+                                      //
+                                break;
+
+                        }
+
+                    }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
                     }
-                    
-                } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
                 }
+       
+                    
+            } catch (SQLException ex) {
+                    
+                handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                         
+            } catch (ParseException ex) {
+                    
+                handleError(PARSE_ERROR, event.getSender(), null);
+                        
             }
+            catch (IndexOutOfBoundsException ex) {
+          
+            handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+            }
+        }
             
         //*****************************************************************************************    
         // *******************************   PERSONAL  ********************************************
         //*****************************************************************************************
               @Override
             public void personal(TokenEvent event) {
-                 System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                 
                 try {
-                    switch (event.getAction()){
-                        
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar personal ");
-                           personal.guardarPersonal(event.getParams());
-                           // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                            personal.editarPersonal(event.getParams());
-                            break;
-                        case Token.ELIMINAR:
-                           personal.eliminarPersonal(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                           // cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
-                    }
                     
+                    String correo = event.getSender();
+        
+                    if(usuario.esUsuario(correo)){
+
+                        if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
+
+                         switch (event.getAction()){
+                        
+                            case Token.AGREGAR: 
+                                
+                               personal.guardarPersonal(event.getParams());
+                               simpleNotifySuccess(event.getSender(), "Personal guardado correctamente");
+                                break;
+                            case Token.EDITAR:
+                                personal.editarPersonal(event.getParams());
+                                simpleNotifySuccess(event.getSender(), "Personal Editado correctamente");
+                                break;
+                            case Token.ELIMINAR:
+                               personal.eliminarPersonal(event.getParams());
+                               simpleNotifySuccess(event.getSender(), "Personal Eliminado correctamente");
+                                break;
+                            case Token.LISTAR:
+                               tableNotifySuccess(event.getSender(), "Lista de Personal", NPersonal.HEADERS,personal.listarPersonal());
+                                break; 
+                            case Token.VER:
+                                  //
+                                break;
+
+                        }   
+
+                        }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
+                    }
+           
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                        
                 } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(PARSE_ERROR, event.getSender(), null);
+                        
+                }
+                catch (IndexOutOfBoundsException ex) {
+          
+                        handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                        
                 }
             }
             
@@ -263,35 +392,57 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
             
             @Override
             public void vehiculos(TokenEvent event) {
-                   System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                  
                 try {
-                    switch (event.getAction()){
+                     String correo = event.getSender();
+        
+                    if(usuario.esUsuario(correo)){
+
+                        if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
+                            switch (event.getAction()){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar vehiculos ");
-                           vehiculo.RegistrarVehiculo(event.getParams(),event.getSender());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                           vehiculo.editarVehiculo(event.getParams(),event.getSender());
-                            break;
-                        case Token.ELIMINAR:
-                           vehiculo.eliminarVehiculo(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                           //cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
+                                case Token.AGREGAR: 
+                                    
+                                   vehiculo.RegistrarVehiculo(event.getParams(),event.getSender());
+                                   simpleNotifySuccess(event.getSender(), "Vehiculo  guardado correctamente");
+                                    break;
+                                case Token.EDITAR:
+                                   vehiculo.editarVehiculo(event.getParams(),event.getSender());
+                                    simpleNotifySuccess(event.getSender(), "Vehiculo  editado correctamente");
+                                    break;
+                                case Token.ELIMINAR:
+                                   vehiculo.eliminarVehiculo(event.getParams());
+                                    simpleNotifySuccess(event.getSender(), "Vehiculo  guardado correctamente");
+                                    break;
+                                case Token.LISTAR:
+                                    tableNotifySuccess(event.getSender(), "Lista de vehiculos", NVehiculo.HEADERS,vehiculo.listarVehiculos());
+                                    break; 
+                                case Token.VER:
+                                      //
+                                    break;
+
+                            }
+
+                        }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
                     }
-                    
+                   
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                        handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+                        
                 } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                       handleError(PARSE_ERROR, event.getSender(), null);
+                       
+                }
+                catch (IndexOutOfBoundsException ex) {
+          
+                handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                
                 }
             }
          
@@ -300,36 +451,58 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
         //*****************************************************************************************
             @Override
             public void servicios(TokenEvent event) {
-                    System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                   
                 try {
-                    switch (event.getAction()){
+                    String correo = event.getSender();
+        
+                        if(usuario.esUsuario(correo)){
+
+                            if(usuario.getRolbyCorreo(correo)== 4 || usuario.getRolbyCorreo(correo)==1){
+
+                                 switch (event.getAction()){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar servicios ");
-                           servicio.RegistrarServicio(event.getParams(),event.getSender());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                           servicio.editarServcio(event.getParams(),event.getSender());
-                            break;
-                        case Token.ELIMINAR:
-                           servicio.eliminarServicio(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                           //cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
-                    }
+                                    case Token.AGREGAR: 
+                                       
+                                       servicio.RegistrarServicio(event.getParams(),event.getSender());
+                                       simpleNotifySuccess(event.getSender(), "Servicio Guardado correctamente");
+                                        break;
+                                    case Token.EDITAR:
+                                       servicio.editarServcio(event.getParams(),event.getSender());
+                                       simpleNotifySuccess(event.getSender(), "Servicio Editado correctamente");
+                                        break;
+                                    case Token.ELIMINAR:
+                                       servicio.eliminarServicio(event.getParams());
+                                       simpleNotifySuccess(event.getSender(), "Servicio Eliminado correctamente");
+                                        break;
+                                    case Token.LISTAR:
+                                       tableNotifySuccess(event.getSender(), "Lista de Servicios", NServicio.HEADERS,servicio.listarServicio());
+                                       break; 
+                                    case Token.VER:
+                                          //
+                                        break;
+                                }
+
+                            }else{
+                                 handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                            }
+                        }else{
+                            handleError(LOGIN_ERROR, event.getSender(), null);
+                        }
+                   
                     
-                } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                 } catch (SQLException ex) {
+        
+                     handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+             
+                 } catch (ParseException ex) {
+        
+                        handleError(PARSE_ERROR, event.getSender(), null);
+            
+                    }
+                catch (IndexOutOfBoundsException ex) {
+          
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                 }
             }
             
         //*****************************************************************************************    
@@ -373,36 +546,55 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
         //*****************************************************************************************
             @Override
             public void gastosOperativos(TokenEvent event) {
-                 System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                
                 try {
-                    switch (event.getAction()){
+                    String correo = event.getSender();
+                    if (usuario.esUsuario(correo)){
+                        if(usuario.getRolbyCorreo(correo)== 1 || usuario.getRolbyCorreo(correo)==4){
+                            
+                           switch (event.getAction()){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar gastos operativos ");
-                            gastos.guardarGastosOperativos(event.getParams(),event.getSender());
-                            simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                            gastos.editarGastosOperativos(event.getParams(),event.getSender());
-                            break;
-                        case Token.ELIMINAR:
-                            gastos.eliminarGastosOperativos(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                            //cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
-                    }
+                            case Token.AGREGAR: 
+                           
+                                gastos.guardarGastosOperativos(event.getParams(),event.getSender());
+                                simpleNotifySuccess(event.getSender(), "Gasto Guardado correctamente");
+                                break;
+                            case Token.EDITAR:
+                                gastos.editarGastosOperativos(event.getParams(),event.getSender());
+                                simpleNotifySuccess(event.getSender(), "Gasto Editado correctamente");
+                                break;
+                            case Token.ELIMINAR:
+                                gastos.eliminarGastosOperativos(event.getParams());
+                                simpleNotifySuccess(event.getSender(), "Gasto Eliminar correctamente");
+                                break;
+                            case Token.LISTAR:
+                                 tableNotifySuccess(event.getSender(), "Lista Gastos Operativos", NGastosOperativos.HEADERS,gastos.listarGastosOperativos());
+                                break; 
+                            case Token.VER:
+                                  //
+                                break;
+                        } 
+                            
+                        }else{
+                             handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                    }else{
+                         handleError(LOGIN_ERROR, event.getSender(), null);
+                    }   
                     
                 } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        
+                     handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+             
+                 } catch (ParseException ex) {
+        
+                        handleError(PARSE_ERROR, event.getSender(), null);
+            
+                    }
+                catch (IndexOutOfBoundsException ex) {
+          
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                 }
             }
             
             
@@ -412,36 +604,63 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
             
             @Override
             public void promociones(TokenEvent event) {
-                System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
+                
                 try {
-                    switch (event.getAction()){
-                        
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar promocion ");
-                           promocion.registrarPromocion(event.getParams(),event.getSender());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.EDITAR:
-                           promocion.editarPromocion(event.getParams(),event.getSender());
-                            break;
-                        case Token.ELIMINAR:
-                           promocion.eliminarPromocion(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                          // cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
-                    }
                     
-                } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    String correo = event.getSender();
+    
+                    if (usuario.esUsuario(correo)){
+                        if(usuario.getRolbyCorreo(correo)== 1 || usuario.getRolbyCorreo(correo)==4){
+
+                            switch (event.getAction()){
+
+                                case Token.AGREGAR: 
+                                  
+                                   promocion.registrarPromocion(event.getParams(),event.getSender());
+                                   simpleNotifySuccess(event.getSender(), "Promocion guardado correctamente");
+                                    break;
+                                case Token.EDITAR:
+                                   promocion.editarPromocion(event.getParams(),event.getSender());
+                                   simpleNotifySuccess(event.getSender(), "Promocion Editada correctamente");
+                                    break;
+                                case Token.ELIMINAR:
+                                   promocion.eliminarPromocion(event.getParams());
+                                   simpleNotifySuccess(event.getSender(), "Promocion Eliminada correctamente");
+                                    break;
+                                case Token.LISTAR:
+                                  tableNotifySuccess(event.getSender(), "Lista De Promociones", NPromocion.HEADERS,promocion.listarPromocion());
+                                break; 
+                                case Token.VER:
+                                      //
+                                break;
+
+                            }
+
+                        }else{
+                            
+                            handleError(AUTHORIZATION_ERROR, event.getSender(), null);
+                        }
+                        
+                    }else{
+                        
+                        handleError(LOGIN_ERROR, event.getSender(), null);
+                    }
+
+                            
+
+                  } catch (SQLException ex) {
+        
+                     handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+             
+                 } catch (ParseException ex) {
+        
+                        handleError(PARSE_ERROR, event.getSender(), null);
+            
+                    }
+                catch (IndexOutOfBoundsException ex) {
+          
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                 }
             }
 
             @Override
@@ -450,6 +669,9 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
         //*****************************************************************************************
             public void pagos(TokenEvent event) {
                 
+                 
+       
+       
             }
 
             @Override
@@ -459,56 +681,140 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
 
             @Override
             public void error(TokenEvent event) {
-                System.out.println(event);
-                System.out.println("error de comando");    
+                handleError(event.getAction(), event.getSender(), event.getParams());
             }
 
+            //*****************************************************************************************    
+            // *******************************   VIAJE  ********************************************
+            //*****************************************************************************************
+            
             @Override
             public void viajes(TokenEvent event) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        //*****************************************************************************************    
-        // *******************************   METODO DE PAGO ********************************************
-        //*****************************************************************************************
-            @Override
-            public void metodo_de_pago(TokenEvent event) {
-                 System.out.println("cantidad de parametros:    "+event.countParams());
+                
+                System.out.println("cantidad de parametros:    "+event.countParams());
                 System.out.println(event.toString());
                 try {
                     switch (event.getAction()){
                         
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar Tarjeta de credito ");
-                           metodo.registrarTarjeta(event.getParams(),event.getSender());
-                           simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
+                        case Token.SOLICITAR: 
+                            System.out.println("entramos a agregar reserva ");
+                            
+                            int idSolicitud = solicitud.idRegistrarSolicitud(event.getParams(), event.getSender());
+                            
+                            int idConductor = solicitud.idBuscarConductor(idSolicitud);
+                            
+                            System.out.println(conductor.getCorreoById(idConductor));
+                           
+                            //solicitud.reservarSolicitud(event.getParams(),event.getSender());
+                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
+                           ArrayList<String[]> p = new ArrayList<>();  // Cambiado de List a ArrayList
+                            String[] data = {String.valueOf(idSolicitud), String.valueOf(solicitud.getTarifa()), event.getParams(1)}; // id_solicitud, tarifa del viaje, ruta
+                            p.add(data);
+                                    
+                            tableNotifySuccess("andresrock1611@gmail.com", "VIAJE", NSolicitarServicio.HEADERS,p);
                             break;
-                        case Token.EDITAR:
-                           metodo.editarTarjeta(event.getParams(),event.getSender());
-                            break;
-                        case Token.ELIMINAR:
-                           metodo.eliminarMetodoDePago(event.getParams());
-                            break;
-                        case Token.LISTAR:
-                          // cliente.listarUsuarios();
-                        break; 
-                          case Token.VER:
-                              //
-                            break;
-                       
+                         
                     }
                     
                 } catch (SQLException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        //*****************************************************************************************    
+        // *******************************   METODO DE PAGO ********************************************
+        //*****************************************************************************************
+            @Override
+            public void metodo_de_pago(TokenEvent event) {
+                
+                try {
+                    
+                    String correo = event.getSender();
+    
+        
+                    if (usuario.esUsuario(correo)){
+                       switch (event.getAction()){
+                        
+                        case Token.AGREGAR: 
+                           
+                           metodo.registrarTarjeta(event.getParams(),event.getSender());
+                           simpleNotifySuccess(event.getSender(), "Metodo de Pago guardado correctamente");
+                            break;
+                        case Token.EDITAR:
+                           metodo.editarTarjeta(event.getParams(),event.getSender());
+                           simpleNotifySuccess(event.getSender(), "Metodo de Pago editado correctamente");
+                            break;
+                        case Token.ELIMINAR:
+                           metodo.eliminarMetodoDePago(event.getParams());
+                           simpleNotifySuccess(event.getSender(), "Metodo de Pago Eliminado correctamente");
+                            break;
+                        case Token.LISTAR:
+                            tableNotifySuccess(event.getSender(), "Lista De Metodos de Pagos", NMetodo_de_pago.HEADERS,metodo.listarMetodoDePago(event.getSender()));
+                            break; 
+                        case Token.VER:
+                              //
+                            break;
+                       
+                    }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
+                    }
+                    
+                    
+                    
+                 } catch (SQLException ex) {
+        
+                     handleError(CONSTRAINTS_ERROR, event.getSender(), null);
+             
+                 } catch (ParseException ex) {
+        
+                        handleError(PARSE_ERROR, event.getSender(), null);
+            
+                    }
+                catch (IndexOutOfBoundsException ex) {
+          
+                       handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                 }
+            }
+         //*****************************************************************************************    
+        // *******************************   METODO DE PAGO ********************************************
+        //*****************************************************************************************           
+            
+        public void ayuda(TokenEvent event) {
+                try{
+                    if(usuario.esUsuario(event.getSender())){
+                        if(usuario.getRolbyCorreo(event.getSender()) == 1){
+                            simpleNotifyAyudaPersonal(event.getSender(), "Ayuda para el personal");
+                        }else if(usuario.getRolbyCorreo(event.getSender()) == 2){
+                            simpleNotifyAyudaConductor(event.getSender(),  "Ayuda para el conductor");
+                        }else if(usuario.getRolbyCorreo(event.getSender()) == 3){
+                            simpleNotifyAyudaCliente(event.getSender(),  "Ayuda para el cliente");
+                        }else if(usuario.getRolbyCorreo(event.getSender()) == 4){
+                            simpleNotifyAyuda(event.getSender(),  "Ayuda para el administrador");
+                        }else{
+                             System.out.println("No existe el id del rol del usuario");       
+                        }
+                    }else{
+                        handleError(LOGIN_ERROR, event.getSender(), null);
+                    }
+                } catch (NumberFormatException ex) {
+                    handleError(NUMBER_FORMAT_ERROR, event.getSender(), null);
+                } catch (IndexOutOfBoundsException ex) {
+                    handleError(INDEX_OUT_OF_BOUND_ERROR, event.getSender(), null);
+                } catch (SQLException ex) {
+                    handleError(CONSTRAINTS_ERROR, event.getSender(), null);
                 }
             }
 
-     public void start() {
-        Thread thread = new Thread(mailVerificationThread);
-        thread.setName("Mail Verfication Thread");
-        thread.start();
-    }
+        public void start() {
+           Thread thread = new Thread(mailVerificationThread);
+           thread.setName("Mail Verfication Thread");
+           thread.start();
+       }
     
     
     @Override
@@ -527,7 +833,7 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
 
     @Override
     public void solicitar(TokenEvent event) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+       
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -586,8 +892,40 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
                     "Usted no posee los permisos necesarios para realizar la acción solicitada"
                 }));
                 break;
+            case LOGIN_ERROR:
+                emailObject = new Email(email, Email.SUBJECT,
+                        HtmlBuilder.generarText(new String[]{
+                    "Acceso denegado",
+                    "Usted no se encuentra como uno de nuestros usuarios, por favor contacte con nuestro supervisor"
+                }));
+                break;
         }
         sendEmail(emailObject);
+    }
+    
+    private void simpleNotifyAyuda(String email, String title){
+        //Email.SUBJECT = "Request Response";
+        Email emailObject = new Email(email, Email.SUBJECT,
+                HtmlBuilder.generateAyuda(title));
+        sendEmail(emailObject);   
+    }
+    
+    private void simpleNotifyAyudaPersonal(String email, String title){
+            Email emailObject = new Email(email, Email.SUBJECT,
+                HtmlBuilder.generateAyudaPersonal(title));
+        sendEmail(emailObject); 
+    }
+    
+    private void simpleNotifyAyudaConductor(String email, String title){
+            Email emailObject = new Email(email, Email.SUBJECT,
+                HtmlBuilder.generateAyudaConductor(title));
+        sendEmail(emailObject); 
+    }
+    
+    private void simpleNotifyAyudaCliente(String email, String title){
+            Email emailObject = new Email(email, Email.SUBJECT,
+                HtmlBuilder.generateAyudaCliente(title));
+        sendEmail(emailObject); 
     }
 
     private void simpleNotifySuccess(String email, String message) {

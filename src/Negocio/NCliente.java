@@ -17,12 +17,16 @@ import java.util.List;
  * @author andre
  */
 public class NCliente {
-
+   
+   public static final String[] HEADERS =
+        {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","CI"};
    private final DCliente dcliente;
-   private DMetodo_de_pago dmetodo;
+   
+  
+   
    public NCliente(){
        dcliente = new DCliente();
-       dmetodo = new DMetodo_de_pago();
+       
    }
    public void guardarCliente(List<String> parametros) throws SQLException, ParseException {
         if(parametros.size() == 8){//para validar que se manden todos los campos
@@ -35,8 +39,7 @@ public class NCliente {
                          parametros.get(6),//genero
                          parametros.get(7)//ci
         );
-        int clienteid = dcliente.getIdByCorreo(parametros.get(2));
-        dmetodo.guardarMetodoEfectivo(clienteid);
+        
         dcliente.Disconnect();
         }else{
             throw new IndexOutOfBoundsException();
@@ -77,6 +80,7 @@ public class NCliente {
         dcliente.Disconnect();
         return usuarios;
     }
+    
      public boolean isUser(String correo) throws SQLException {
         return dcliente.getIdByCorreo(correo) != -1;
     }

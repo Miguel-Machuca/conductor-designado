@@ -17,6 +17,10 @@ import java.util.List;
  */
 public class NMetodo_de_pago {
     
+     
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","NUMERO DE TARJETA","NOMBRE DE LA TARJETA","FECHA DE VENCIMIENTO","CVV","ID_CLIENTE"};
+    
     DCliente dcliente;
     DMetodo_de_pago metodo_de_pago;
     
@@ -79,8 +83,10 @@ public class NMetodo_de_pago {
         
     }
     
-    public ArrayList<String[]> listarMetodoDePago() throws SQLException {
-        ArrayList<String[]> metodos = (ArrayList<String[]>) metodo_de_pago.listar();
+    public ArrayList<String[]> listarMetodoDePago(String correo) throws SQLException {
+         int clienteid = dcliente.getIdByCorreo(correo);// validamos q un cliente 
+         
+        ArrayList<String[]> metodos = (ArrayList<String[]>) metodo_de_pago.listar(clienteid);
         metodo_de_pago.Disconnect();
         return metodos;
     }

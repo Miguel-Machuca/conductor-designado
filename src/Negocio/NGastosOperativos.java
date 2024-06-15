@@ -15,6 +15,10 @@ import java.util.List;
  * @author andre
  */
 public class NGastosOperativos {
+    
+   
+   public static final String[] HEADERS =
+        {"ID","MONTO","FECHA","DESCRIPCION","ID_PERSONAL"};
     DPersonal dpersonal;
     DGastoOperativo dgastos;
      public NGastosOperativos(){
@@ -22,7 +26,7 @@ public class NGastosOperativos {
          dgastos = new DGastoOperativo();
      }
      public void guardarGastosOperativos(List<String> parametros, String correo) throws SQLException, ParseException {
-        if (parametros.size() == 4){
+        if (parametros.size() == 3){
             int personalid = dpersonal.getIdByCorreo(correo);
             if(personalid != -1) {
               dgastos.guardar(parametros.get(0),//monto
@@ -36,7 +40,7 @@ public class NGastosOperativos {
           dgastos.Disconnect();
     }
      public void editarGastosOperativos(List<String> parametros, String correo) throws SQLException, ParseException {
-        if (parametros.size() == 5){
+        if (parametros.size() == 4){
             int personalid = dpersonal.getIdByCorreo(correo);
             if(personalid != -1) {
               dgastos.editar(Integer.parseInt(parametros.get(0)),//monto

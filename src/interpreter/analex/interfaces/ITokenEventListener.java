@@ -31,6 +31,7 @@ public interface ITokenEventListener {
     void viajes(TokenEvent event);
     void clientes(TokenEvent event);
     void metodo_de_pago(TokenEvent event);
+    void ayuda(TokenEvent event);
   
     //agregar mas casos de uso de ser necesario
 }

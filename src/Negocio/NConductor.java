@@ -16,8 +16,13 @@ import java.util.List;
  * @author andre
  */
 public class NConductor {
+    
+     
     DConductor dconductor ;
-     public NConductor(){
+    public static final String[] HEADERS =
+        {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","NUMERO DE LICENCIA","TIPO DE LICENCIA","FECHA DE VENCIMIENTO"};
+    
+    public NConductor(){
       dconductor  = new DConductor();
    }
    public void guardarConductor(List<String> parametros) throws SQLException, ParseException {

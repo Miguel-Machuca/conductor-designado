@@ -38,6 +38,7 @@ public class Token {
     public static final int PERSONAL = 111;
     public static final int ROL = 112;
     public static final int METODO_DE_PAGO = 113;
+    public static final int AYUDA = 114;
     
     
     //ajustar de acuerdo a sus acciones con valores entre 200 a 299
@@ -56,10 +57,13 @@ public class Token {
     public static final int ELIMINAR = 209;
     public static final int VER = 210;
     public static final int LISTAR = 211;
+    public static final int SOLICITAR = 212;
+    
     
     
     public static final int ERROR_COMMAND = 300;
     public static final int ERROR_CHARACTER = 301;
+    
     
     //constantes literales para realizar un efecto de impresión
     public static final String LEXEME_CU = "caso de uso";
@@ -86,6 +90,7 @@ public class Token {
      public static final String LEXEME_CONDUCTOR = "conductor";
      public static final String LEXEME_PERSONAL = "personal";
      public static final String LEXEME_ROL = "rol";
+     public static final String LEXEME_AYUDA = "ayuda";
      public static final String LEXEME_METODO_DE_PAGO = "metodoDePago";
     
     //ajustar de acuerdo a sus acciones con valores en string
@@ -103,6 +108,8 @@ public class Token {
     public static final String LEXEME_ELIMINAR = "eliminar";
     public static final String LEXEME_VER = "ver";
     public static final String LEXEME_LISTAR = "listar";
+    public static final String LEXEME_SOLICITAR = "solicitar";
+    
     
     public static final String LEXEME_ERROR_COMMAND = "UNKNOWN COMMAND";
     public static final String LEXEME_ERROR_CHARACTER = "UNKNOWN CHARACTER";
@@ -265,7 +272,8 @@ public class Token {
                 return LEXEME_VER;
             case LISTAR:
                 return LEXEME_LISTAR;
-            
+            case SOLICITAR:
+                return LEXEME_SOLICITAR;
                 
                 
                 
@@ -343,6 +351,8 @@ public class Token {
                 return PERSONAL;
             case LEXEME_ROL:
                 return ROL;
+            case LEXEME_AYUDA:
+                return AYUDA;
             case LEXEME_METODO_DE_PAGO:
                 return METODO_DE_PAGO;
                 
@@ -358,6 +368,8 @@ public class Token {
                 return VER;
             case LEXEME_LISTAR:
                 return LISTAR;
+            case LEXEME_SOLICITAR:
+                return SOLICITAR;
                 
                 
             case LEXEME_ERROR_COMMAND:
