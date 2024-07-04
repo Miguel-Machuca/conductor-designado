@@ -791,9 +791,9 @@ public class MailApplication implements IEmailEventListener, ITokenEventListener
                             simpleNotifyAyudaPersonal(event.getSender(), "Ayuda para el personal");
                         }else if(usuario.getRolbyCorreo(event.getSender()) == 2){
                             simpleNotifyAyudaConductor(event.getSender(),  "Ayuda para el conductor");
-                        }else if(usuario.getRolbyCorreo(event.getSender()) == 3){
-                            simpleNotifyAyudaCliente(event.getSender(),  "Ayuda para el cliente");
                         }else if(usuario.getRolbyCorreo(event.getSender()) == 4){
+                            simpleNotifyAyudaCliente(event.getSender(),  "Ayuda para el cliente");
+                        }else if(usuario.getRolbyCorreo(event.getSender()) == 5){
                             simpleNotifyAyuda(event.getSender(),  "Ayuda para el administrador");
                         }else{
                              System.out.println("No existe el id del rol del usuario");       

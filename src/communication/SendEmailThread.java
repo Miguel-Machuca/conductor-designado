@@ -58,9 +58,9 @@ public class SendEmailThread implements Runnable {
     private final static String PORT_SMTP = "465";
     private final static String PROTOCOL = "smtp";
     private final static String HOST = "smtp.googlemail.com";
-    private final static String USER = "";
-    private final static String MAIL = "";
-    private final static String MAIL_PASSWORD = "";
+    private final static String USER = "mmachucayavita@gmail.com";
+    private final static String MAIL = "mmachucayavita@gmail.com";
+    private final static String MAIL_PASSWORD = "rckqnbhaxqecmfiu";
    /*
     */
     private Email email;
