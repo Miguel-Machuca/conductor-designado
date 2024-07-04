@@ -21,12 +21,13 @@ public class DServicio {
      private final  sqlconnection connection;
      
      public DServicio(){
-          this.connection = new sqlconnection(
-                "postgres",
-                "admin", 
-                "127.0.0.1",
-                "5432", "db_tecno");
-     }
+         this.connection = new sqlconnection(
+                "grupo04sc",
+                "grup004grup004", 
+                "mail.tecnoweb.org.bo",
+                "5432", "db_grupo04sc");
+    }
+    
      
       public void Disconnect(){
         if( connection!= null ){

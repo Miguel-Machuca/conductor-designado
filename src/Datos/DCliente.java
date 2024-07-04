@@ -12,80 +12,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import Utils.DateString;
+import java.sql.Connection;
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author andre
  */
 public class DCliente {
-    
-    private final  sqlconnection connection;
+
+    private final sqlconnection connection;
 
     public DCliente() {
         this.connection = new sqlconnection(
-                "postgres",
-                "admin", 
-                "127.0.0.1",
-                "5432", "db_tecno");
+                "grupo04sc",
+                "grup004grup004",
+                "mail.tecnoweb.org.bo",
+                "5432", "db_grupo04sc");
     }
+
     // cuando la connecion sea distinto de null se podra hacer la desconeccion a la base de datos 
-    public void Disconnect(){
-        if( connection!= null ){
+    public void Disconnect() {
+        if (connection != null) {
             connection.closeConnection();
         }
     }
-    //prueba de herencia en postgresSql
-    /*public void create(String nombre, String apellido, String correo, String password, String celular, String fechaNacimiento, String genero, String ci) throws SQLException {
-        // Desactiva el auto-commit para iniciar una transacción
-        connection.connect().setAutoCommit(false);
-        
-        try {
-            // Inserción en la tabla usuario
-            String queryUsuario = "INSERT INTO usuario (nombre, apellido, correo, password, celular, fecha_de_nacimiento, genero, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, 'cliente') RETURNING id";
-            PreparedStatement psUsuario = connection.connect().prepareStatement(queryUsuario);
-            psUsuario.setString(1, nombre);
-            psUsuario.setString(2, apellido);
-            psUsuario.setString(3, correo);
-            psUsuario.setString(4, password);
-            psUsuario.setString(5, celular);
-            psUsuario.setString(6, fechaNacimiento);
-            psUsuario.setString(7, genero);
 
-            ResultSet rs = psUsuario.executeQuery();
-            int usuarioId = -1;
-            if (rs.next()) {
-                usuarioId = rs.getInt("id");
-            } else {
-                throw new SQLException("No se pudo obtener el ID del usuario insertado.");
-            }
-
-            // Inserción en la tabla cliente
-            String queryCliente = "INSERT INTO cliente (id, ci) VALUES (?, ?)";
-            PreparedStatement psCliente = connection.connect().prepareStatement(queryCliente);
-            psCliente.setInt(1, usuarioId);
-            psCliente.setString(2, ci);
-
-            if (psCliente.executeUpdate() == 0) {
-                throw new SQLException("Class DCliente.java: Ocurrió un error al insertar un cliente en guardar()");
-            }
-
-            // Confirmar la transacción
-            connection.connect().commit();
-        } catch (SQLException e) {
-            // Deshacer la transacción en caso de error
-            connection.connect().rollback();
-            throw e;
-        } finally {
-            // Restaurar auto-commit
-            connection.connect().setAutoCommit(true);
-        }
-    }
-     */
-    public void guardar(String nombre, String apellido, String correo, String password, String celular, String fechaNacimiento, String genero, String ci) throws SQLException, ParseException {
+    public int guardar(String nombre, String apellido, String correo, String password, String celular, String fechaNacimiento, String genero, String ci) throws SQLException, ParseException {
         // Insertar directamente en la tabla cliente con encriptación de contraseña
         String query = "INSERT INTO cliente (nombre, apellido, correo, password, celular, fecha_de_nacimiento, genero, tipo_usuario, ci, id_rol) "
-                + "VALUES (?, ?, ?, crypt(?, gen_salt('bf')), ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, crypt(?, gen_salt('bf')), ?, ?, ?, ?, ?, ?) RETURNING id";
 
         PreparedStatement ps = connection.connect().prepareStatement(query);
         ps.setString(1, nombre);
@@ -98,9 +56,14 @@ public class DCliente {
         ps.setString(8, "cliente");  // Especificar tipo de usuario como 'cliente'
         ps.setString(9, ci);
         ps.setInt(10, 3);
-        
-        if (ps.executeUpdate() == 0) {
-            System.err.println("Class DCliente.java: Ocurrió un error al insertar un cliente en guardar()");
+
+        ResultSet rs = ps.executeQuery();  // Ejecutar la consulta y obtener el ResultSet con el id generado
+
+        if (rs.next()) {
+            int id = rs.getInt("id");  // Obtener el id generado
+            return id;  // Retornar el id
+        } else {
+            throw new SQLException("Class DCliente.java: Ocurrió un error al insertar un cliente en guardar() - No ID obtained.");
         }
     }
 
@@ -135,7 +98,7 @@ public class DCliente {
         String query = "DELETE FROM cliente WHERE id = ?";
         PreparedStatement ps = connection.connect().prepareStatement(query);
         ps.setInt(1, id);
-        
+
         int rowsAffected = ps.executeUpdate();
         if (rowsAffected == 0) {
             System.err.println("No se encontró ningún cliente con el ID especificado.");
@@ -143,13 +106,13 @@ public class DCliente {
             System.out.println("Cliente eliminado exitosamente.");
         }
     }
-    
+
     public List<String[]> listar() throws SQLException {
         List<String[]> clientes = new ArrayList<>();
         String query = "SELECT * FROM cliente";
         PreparedStatement ps = connection.connect().prepareStatement(query);
         ResultSet rs = ps.executeQuery();
-        
+
         while (rs.next()) {
             String[] cliente = {
                 String.valueOf(rs.getInt("id")),
@@ -163,7 +126,7 @@ public class DCliente {
             };
             clientes.add(cliente);
         }
-        
+
         return clientes;
     }
 
@@ -173,9 +136,9 @@ public class DCliente {
         PreparedStatement ps = connection.connect().prepareStatement(query);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
-        
+
         if (rs.next()) {
-            cliente = new String[] {
+            cliente = new String[]{
                 String.valueOf(rs.getInt("id")),
                 rs.getString("nombre"),
                 rs.getString("apellido"),
@@ -186,24 +149,43 @@ public class DCliente {
                 rs.getString("ci")
             };
         }
-        
+
         return cliente;
     }
 
-    public int getIdByCorreo(String correo) throws SQLException{
-        int id=-1;
+    public int getIdByCorreo(String correo) throws SQLException {
+        int id = -1;
         String query = "SELECT id FROM cliente WHERE correo=?";
         PreparedStatement ps = connection.connect().prepareStatement(query);
-        ps.setString(1,correo);
-        
+        ps.setString(1, correo);
+
         ResultSet set = ps.executeQuery();
-        if (set.next()){
+        if (set.next()) {
             id = set.getInt("id");
         }
         return id;
     }
 
-  
+    public String getCorreoById(int id) throws SQLException {
+        String correo = null;
+        String query = "SELECT correo FROM cliente WHERE id = ?";
 
-   
+        try (Connection conn = connection.connect();
+                PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    correo = rs.getString("correo");
+                }
+            }
+        } catch (SQLException e) {
+            // Logging del error
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al obtener el correo por ID", e);
+            throw e;
+        }
+        return correo;
+    }
+
 }

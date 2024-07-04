@@ -79,7 +79,7 @@ public class MailVerificationThread implements Runnable{
                 System.out.println("**************** Conexion cerrada ********************");
                 
                 if(count > 0) {
-                    //System.out.println("ENtraditaaaaaaaaaaaaaaaa");
+                   
                    emailEventListener.onReceiveEmailEvent(emails);
                 }
                 

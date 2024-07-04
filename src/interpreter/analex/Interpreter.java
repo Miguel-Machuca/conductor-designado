@@ -106,7 +106,6 @@ public class Interpreter implements Runnable{
                 listener.metodo_de_pago(token_event);
                 break;
             case Token.AYUDA:
-                
                 listener.ayuda(token_event);
                 break;
         }

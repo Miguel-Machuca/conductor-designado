@@ -45,7 +45,7 @@ public class NMetodo_de_pago {
                                  Integer.parseInt(parametros.get(4)),//cvv_cvc
                                  clienteid);//
                                 
-                metodo_de_pago.Disconnect();
+               
             }
         }else{
             throw new IndexOutOfBoundsException();
@@ -66,7 +66,7 @@ public class NMetodo_de_pago {
                                  Integer.parseInt(parametros.get(5)),//cvv_cvc
                                  clienteid);//
                                 
-                metodo_de_pago.Disconnect();
+             
             }
         }else{
             throw new IndexOutOfBoundsException();

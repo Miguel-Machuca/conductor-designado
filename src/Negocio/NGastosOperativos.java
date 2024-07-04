@@ -6,6 +6,7 @@
 package Negocio;
 import Datos.DGastoOperativo;
 import Datos.DPersonal;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class NGastosOperativos {
    
    public static final String[] HEADERS =
         {"ID","MONTO","FECHA","DESCRIPCION","ID_PERSONAL"};
+    public static final String[] HEADERSR = {"FECHAS", "MONTO"};
     DPersonal dpersonal;
     DGastoOperativo dgastos;
      public NGastosOperativos(){
@@ -70,4 +72,21 @@ public class NGastosOperativos {
         return usuarios;
     }
   
+    
+     public void listarGraficaGastosPorFecha(List<String> parametros)throws SQLException, IOException, ParseException, IndexOutOfBoundsException {
+        if (parametros.size() == 2){
+           
+             dgastos.listarGraficaGastosPorFecha(parametros.get(0), parametros.get(1));
+            
+        }else{
+            throw new IndexOutOfBoundsException();
+        }
+          dgastos.Disconnect();
+    }
+     public ArrayList<String[]> reporte(List<String> parametros) throws SQLException, ParseException{
+        ArrayList<String[]> gastos = (ArrayList<String[]>) dgastos.reporte(parametros.get(0),parametros.get(1));
+       dgastos.Disconnect();
+        return gastos;
+    }
+     
 }

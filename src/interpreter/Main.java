@@ -46,7 +46,7 @@ public class Main {
         String comando2 = "usuario editar [1,jose   , lopez@gmail.com,12345678,63489070, 1998-06-21, masculino] ";
         String comando3 = "usuario eliminar [1] ";
         
-        String comando4 = "cliente agregar [felipe, chavez , felipe@gmail.com,12345678,63489070, 1998-06-21, masculino,7987833] ";
+        String comando4 = "cliente agregar [Cliente1, cliente , andresrock1711@gmail.com,12345678,63489070, 1998-06-21, masculino,7987833] ";
         String comando5 = "cliente editar [6,Andres editado , chavez , andy@gmail.com,12345,63489070, 1998-06-21, masculino,7987833] ";
         String comando6 = "cliente eliminar [8] ";
         
@@ -70,7 +70,7 @@ public class Main {
         String comando20 = "vehiculo editar [1,Audi,A4,Bol123,5367272,2028-08-22,activo,juan@gmail.com]";
         String comando21 = "vehiculo eliminar [1]";
         
-        String comando22 ="servicio agregar[taxi premium, servcio de trasporte privado ]";
+        String comando22 ="servicio agregar[taxi, servcio de trasporte privado ]";
         String comando23 ="servicio editar [2, moto, servcio de trasporte privado ]";
         String comando24 ="servicio eliminar [3]";
         
@@ -90,15 +90,15 @@ public class Main {
         
           
         String comando28 = "viaje solicitar   [1, https://maps.app.goo.gl/kL8J44qZz8xNASSL6]";// cliente solicita un viaje
-        String comando = "viaje aceptar   [1]";//codigo del viajes "id_solicitud"-->conductor avisa que esta en camino
-        String comando55 = "viaje pagar   [111,1]";//codigo del viajes "id_solicitud" y el metodo de pago
+        //String comando = "viaje aceptar   [1]";//codigo del viajes "id_solicitud"-->conductor avisa que esta en camino
+        //String comando55 = "viaje pagar   [111,1]";//codigo del viajes "id_solicitud" y el metodo de pago
         
         
         
         
         
-        String correo = "miguel@gmail.com";
-        Interpreter interpreter = new Interpreter(comando4, correo);       
+        String correo = "bianka@gmail.com";
+        Interpreter interpreter = new Interpreter(comando28, correo);       
         interpreter.setListener(new ITokenEventListener() {
             
             @Override
@@ -119,10 +119,9 @@ public class Main {
                             System.out.println(conductor.getCorreoById(idConductor));
                            
                             //solicitud.reservarSolicitud(event.getParams(),event.getSender());
-                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
+                            System.out.println("tarifa del viaje: ");
                            List<String[]> p = new ArrayList<>();
-                            String[] data = {String.valueOf(idSolicitud), String.valueOf(solicitud.getTarifa()),event.getParams(2)};//id_solicitud,tarifa del viaje, ruta
-                                    p.add(data);
+                           
                             break;
                          
                     }
@@ -157,7 +156,7 @@ public class Main {
                             System.out.println(conductor.getCorreoById(idConductor));
                             
                             //solicitud.reservarSolicitud(event.getParams(),event.getSender());
-                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
+                           
                            
                            // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
                             break;
@@ -466,42 +465,7 @@ public class Main {
             }
             
        
-            
-         //*****************************************************************************************    
-        // *******************************   SOLICITAR SERVICIO  ********************************************
-        //*****************************************************************************************       
-            @Override
-            public void solicitar(TokenEvent event) {
-                
-                System.out.println("cantidad de parametros:    "+event.countParams());
-                System.out.println(event.toString());
-                try {
-                    switch (event.getAction()){
-                        
-                        case Token.AGREGAR: 
-                            System.out.println("entramos a agregar reserva ");
-                            solicitud.registrarSolicitud(event.getParams(), event.getSender());                            
-                            System.out.println("tarifa del viaje: "+ solicitud.getTarifa());
-                           
-                           // simpleNotifySuccess(event.getSender(), "Usuario guardado correctamente");
-                            break;
-                        case Token.LISTAR:
-                           // 
-                        break; 
-                        case Token.VER:
-                           //
-                        break;
-                       
-                    }
-                    
-                } catch (SQLException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+       
             
         //*****************************************************************************************    
         // *******************************   GASTOS OPERATIVOS  ********************************************
@@ -639,7 +603,7 @@ public class Main {
 
             @Override
             public void ayuda(TokenEvent event) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
  

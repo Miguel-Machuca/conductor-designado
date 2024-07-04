@@ -73,63 +73,6 @@ public class SendEmailThread implements Runnable {
     @Override
     public void run() {
 
-        /*try {
-            Socket skCliente = new Socket(servidor, puerto);
-            BufferedReader entrada = new BufferedReader(new InputStreamReader(skCliente.getInputStream()));
-            DataOutputStream salida = new DataOutputStream(skCliente.getOutputStream());
-
-            if ((skCliente != null) && (entrada != null) && (salida != null)) {
-                System.out.println(" S: " + entrada.readLine());
-
-                comando = "HELO " + servidor + "\n";
-                System.out.print("C : " + comando);
-                salida.writeBytes(comando);
-                System.out.println("S : " + entrada.readLine());
-
-                comando = "MAIL FROM : " + user_emisor + "\n";
-                System.out.print("C : " + comando);
-                salida.writeBytes(comando);
-                System.out.println("S : " + entrada.readLine());
-
-                comando = "RCPT TO : " + user_receptor + "\n";
-                System.out.print("C : " + comando);
-                salida.writeBytes(comando);
-                System.out.println("S : " + entrada.readLine());
-
-                comando = "DATA\n";
-                System.out.print("C : " + comando);
-                salida.writeBytes(comando);
-                System.out.println("S : " + entrada.readLine());
-                    
-                comando = "SUBJECT: " + email.getSubject() + "\n";
-                comando += "Content-Type: text/html; charset=UTF-8\n";
-                comando += email.getMessage() + "\n";
-                comando += ".\n"; // No mandar espacios, solo punto
-
-                System.out.print("C : " + comando);
-                salida.writeBytes(comando);
-                System.out.println("S : " + entrada.readLine());
-
-                //cerrar la conexion
-                comando = "QUIT\n";
-                System.out.print("C :" + comando);
-                salida.writeBytes(comando);
-                System.out.println("S :" + entrada.readLine());
-
-                skCliente.close();
-                entrada.close();
-                salida.close();
-            }else{
-                System.out.println("OK");
-            }
-
-        } catch (Exception e) {
-            System.out.println(" C : " + e.getMessage());
-        }*/
-
-        /*email.getTo();
-         email.getSubject();
-        email.getMessage();*/
         Properties properties = new Properties();
         properties.put("mail.transport.protocol", PROTOCOL);
         properties.setProperty("mail.smtp.host", HOST);

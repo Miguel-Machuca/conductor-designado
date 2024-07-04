@@ -10,7 +10,7 @@ package Utils;
  * @author andre
  */
 public class Email {
-     public static final String SUBJECT = "Request respose";
+    public static  String SUBJECT = "Request respose";
     private String from;
     private String to;
     private String subject;

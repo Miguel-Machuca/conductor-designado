@@ -22,7 +22,7 @@ public interface ITokenEventListener {
     void vehiculos(TokenEvent event);
     void servicios(TokenEvent event);     
     void reservas(TokenEvent event); 
-    void solicitar(TokenEvent event);
+    //void solicitar(TokenEvent event);
     void gastosOperativos(TokenEvent event);     
     void promociones(TokenEvent event);     
     void pagos(TokenEvent event);     
@@ -32,6 +32,5 @@ public interface ITokenEventListener {
     void clientes(TokenEvent event);
     void metodo_de_pago(TokenEvent event);
     void ayuda(TokenEvent event);
-  
     //agregar mas casos de uso de ser necesario
 }

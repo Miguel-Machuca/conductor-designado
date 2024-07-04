@@ -21,16 +21,18 @@ public class NCliente {
    public static final String[] HEADERS =
         {"ID","NOMBRE","APELLIDO","CORREO","CELULAR","FECHA DE NACIMIENTO","GENERO","CI"};
    private final DCliente dcliente;
+   private final DMetodo_de_pago dpago;
    
   
    
    public NCliente(){
        dcliente = new DCliente();
+       dpago  = new DMetodo_de_pago();
        
    }
    public void guardarCliente(List<String> parametros) throws SQLException, ParseException {
         if(parametros.size() == 8){//para validar que se manden todos los campos
-        dcliente.guardar(parametros.get(0),//nombre
+        int idcliente = dcliente.guardar(parametros.get(0),//nombre
                          parametros.get(1),//apellido
                          parametros.get(2),//correo
                          parametros.get(3),//contraseña
@@ -38,7 +40,11 @@ public class NCliente {
                          parametros.get(5),//fechaNacimiento
                          parametros.get(6),//genero
                          parametros.get(7)//ci
+                         
         );
+        
+       
+        //dpago.guardarMetodoEfectivo(idcliente);// le creamos un metodo de pago por defecto en efectivo
         
         dcliente.Disconnect();
         }else{
@@ -84,5 +90,13 @@ public class NCliente {
      public boolean isUser(String correo) throws SQLException {
         return dcliente.getIdByCorreo(correo) != -1;
     }
-   
+     
+   public String getCorreoById(int idCliente) throws SQLException{
+       String correo = "hay un error";
+       if (idCliente != -1){
+           correo = dcliente.getCorreoById(idCliente);
+       } 
+       
+       return correo;
+   }
 }

@@ -5,6 +5,8 @@
  */
 package interpreter.analex.utils;
 
+import jdk.nashorn.internal.ir.Terminal;
+
 /**
  *
  * @author ronal
@@ -58,12 +60,18 @@ public class Token {
     public static final int VER = 210;
     public static final int LISTAR = 211;
     public static final int SOLICITAR = 212;
+    public static final int ACEPTAR = 213;
+    public static final int TERMINAR = 214;
+    public static final int NOTIFICAR = 215;
+    public static final int GASTOS = 216;
+    public static final int TRANSACCIONES = 217;
+    
+    
     
     
     
     public static final int ERROR_COMMAND = 300;
     public static final int ERROR_CHARACTER = 301;
-    
     
     //constantes literales para realizar un efecto de impresión
     public static final String LEXEME_CU = "caso de uso";
@@ -90,8 +98,8 @@ public class Token {
      public static final String LEXEME_CONDUCTOR = "conductor";
      public static final String LEXEME_PERSONAL = "personal";
      public static final String LEXEME_ROL = "rol";
-     public static final String LEXEME_AYUDA = "ayuda";
      public static final String LEXEME_METODO_DE_PAGO = "metodoDePago";
+     public static final String LEXEME_AYUDA = "ayuda";
     
     //ajustar de acuerdo a sus acciones con valores en string
     //Titulos de las acciones generales en string
@@ -109,6 +117,13 @@ public class Token {
     public static final String LEXEME_VER = "ver";
     public static final String LEXEME_LISTAR = "listar";
     public static final String LEXEME_SOLICITAR = "solicitar";
+    public static final String LEXEME_ACEPTAR = "aceptar";
+    public static final String LEXEME_TERMINAR = "terminar";
+    public static final String LEXEME_NOTIFICAR = "notificar";
+    public static final String LEXEME_GASTOS = "gastos";
+    public static final String LEXEME_TRANSACCIONES = "transacciones";
+    
+    
     
     
     public static final String LEXEME_ERROR_COMMAND = "UNKNOWN COMMAND";
@@ -258,8 +273,9 @@ public class Token {
                 return LEXEME_ROL;    
             case METODO_DE_PAGO:
                 return LEXEME_METODO_DE_PAGO;   
-                
-                
+            case AYUDA:
+                return LEXEME_AYUDA;    
+
                 
             //acciones    
             case AGREGAR:
@@ -274,6 +290,20 @@ public class Token {
                 return LEXEME_LISTAR;
             case SOLICITAR:
                 return LEXEME_SOLICITAR;
+            case ACEPTAR:
+                return LEXEME_ACEPTAR;
+            case TERMINAR:
+                return LEXEME_TERMINAR;
+            case NOTIFICAR:
+                return LEXEME_NOTIFICAR;
+            case GASTOS:
+                return LEXEME_GASTOS;
+            case TRANSACCIONES:
+                return LEXEME_TRANSACCIONES;      
+                    
+                
+                
+                
                 
                 
                 
@@ -351,11 +381,10 @@ public class Token {
                 return PERSONAL;
             case LEXEME_ROL:
                 return ROL;
-            case LEXEME_AYUDA:
-                return AYUDA;
             case LEXEME_METODO_DE_PAGO:
                 return METODO_DE_PAGO;
-                
+            case LEXEME_AYUDA:
+                return AYUDA;     
                 
                 
             case LEXEME_AGREGAR:
@@ -370,6 +399,16 @@ public class Token {
                 return LISTAR;
             case LEXEME_SOLICITAR:
                 return SOLICITAR;
+            case LEXEME_ACEPTAR:
+                return ACEPTAR;
+            case LEXEME_TERMINAR:
+                return TERMINAR;
+            case LEXEME_NOTIFICAR:
+                return NOTIFICAR;
+            case LEXEME_GASTOS:
+                return GASTOS;       
+            case LEXEME_TRANSACCIONES:
+                return TRANSACCIONES;
                 
                 
             case LEXEME_ERROR_COMMAND:

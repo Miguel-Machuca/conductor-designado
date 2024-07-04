@@ -30,13 +30,13 @@ public class DSolicitarServicio {
      private final  sqlconnection connection;
 
     public DSolicitarServicio() {
-        this.connection = new sqlconnection(
-                "postgres",
-                "admin", 
-                "127.0.0.1",
-                "5432", "db_tecno");
-        
+       this.connection = new sqlconnection(
+                "grupo04sc",
+                "grup004grup004", 
+                "mail.tecnoweb.org.bo",
+                "5432", "db_grupo04sc");
     }
+    
     // cuando la connecion sea distinto de null se podra hacer la desconeccion a la base de datos 
     public void Disconnect(){
         if( connection!= null ){
@@ -273,61 +273,45 @@ public class DSolicitarServicio {
         return idConductor;
     }    
     
-    
-    /*
-    public void eliminar(int id) throws SQLException {
-        String query = "DELETE FROM solicitar_servicio WHERE id = ?";
-        PreparedStatement ps = connection.connect().prepareStatement(query);
-        ps.setInt(1, id);
+     public int obtenerIdCliente(int id) throws SQLException {
+        String query = "SELECT id_cliente FROM solicitar_servicio WHERE id = ?";
+        int idCliente = -1;
 
-        int rowsAffected = ps.executeUpdate();
-        if (rowsAffected == 0) {
-            System.err.println("No se encontró ninguna solicitud de servicio con el ID especificado.");
-        } else {
-            System.out.println("Solicitud de servicio eliminada exitosamente.");
-        }
-    }
+        try (Connection conn = connection.connect();
+             PreparedStatement ps = conn.prepareStatement(query)) {
 
-    
-    public List<String[]> listar() throws SQLException {
-        List<String[]> solicitudesDeServicio = new ArrayList<>();
-        String query = "SELECT * FROM solicitar_servicio";
-        PreparedStatement ps = connection.connect().prepareStatement(query);
-        ResultSet rs = ps.executeQuery();
+            ps.setInt(1, id);
 
-        while (rs.next()) {
-            String[] solicitudDeServicio = {
-                String.valueOf(rs.getInt("id")),
-                String.valueOf(rs.getInt("id_cliente")),
-                String.valueOf(rs.getInt("id_servicio"))
-            };
-            solicitudesDeServicio.add(solicitudDeServicio);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    idCliente = rs.getInt("id_cliente");
+                } else {
+                    System.err.println("No se encontró el id del cliente  ");
+                }
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Error al obtener el ID del cliente", e);
+            throw e;
         }
 
-        return solicitudesDeServicio;
-    }
+        return idCliente;
+    }    
+     
+     // DSolicitarServicio.java
 
-   
-    public String[] ver(int id) throws SQLException {
-        String[] solicitudDeServicio = null;
-        String query = "SELECT * FROM solicitar_servicio WHERE id = ?";
-        PreparedStatement ps = connection.connect().prepareStatement(query);
-        ps.setInt(1, id);
+public int obtenerSolicitudPendientePorConductor(int idConductor) throws SQLException {
+    String query = "SELECT id FROM solicitar_servicio WHERE id_conductor = ? AND estado = 'pendiente'";
+    try (Connection conn = connection.connect();
+         PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setInt(1, idConductor);
         ResultSet rs = ps.executeQuery();
-
         if (rs.next()) {
-            solicitudDeServicio = new String[]{
-                String.valueOf(rs.getInt("id")),
-                String.valueOf(rs.getInt("id_cliente")),
-                String.valueOf(rs.getInt("id_servicio"))
-            };
+            return rs.getInt("id");
         }
-
-        return solicitudDeServicio;
     }
-*/
+    return -1; // No se encontró ninguna solicitud pendiente
+}
 
-
-
+  
   
 }

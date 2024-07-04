@@ -26,13 +26,13 @@ public class DUsuario {
     private final  sqlconnection connection;
 
     public DUsuario() {
-        this.connection = new sqlconnection(
-                "postgres",
-                "admin", 
-                "127.0.0.1",
-                "5432", "db_tecno");
-        
+       this.connection = new sqlconnection(
+                "grupo04sc",
+                "grup004grup004", 
+                "mail.tecnoweb.org.bo",
+                "5432", "db_grupo04sc");
     }
+    
     // cuando la connecion sea distinto de null se podra hacer la desconeccion a la base de datos 
     public void Disconnect(){
         if( connection!= null ){

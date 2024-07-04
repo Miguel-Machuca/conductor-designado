@@ -8,6 +8,10 @@ import Datos.DCliente;
 import Datos.DConductor;
 import Datos.DSolicitarServicio;
 import Datos.DServicio;
+import Datos.DTransacciones;
+import Utils.Email;
+import Utils.HtmlBuilder;
+import communication.SendEmailThread;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -34,119 +38,91 @@ public class NSolicitarServicio {
     DConductor dConductor;
     DSolicitarServicio dSolicitarServicio;
     DServicio dservicio;
+    DTransacciones dtransaccion;
+    
    // public final float CostoReserva=(float) 0.002;//borrar luego
     private static final double R = 6371;
-    private static double Tarifa ;
+   
     
     
     public NSolicitarServicio(){
         dcliente = new DCliente();
         dConductor = new DConductor();
         dSolicitarServicio = new DSolicitarServicio();
+        dtransaccion = new DTransacciones();
         dservicio = new DServicio();
-        Tarifa = 0.0;
+     
  
     }
     
-    public double getTarifa(){
-        return Tarifa;
-    }
-    
-    private void setTarifa(double tarifa){
-        this.Tarifa = tarifa;
-    }
+   
   
-    public void registrarSolicitud(List<String> parametros, String correo) throws SQLException, ParseException, Exception {
-        Integer conductor = elegirConductor();
-        if (conductor != null){
-            int clienteid = dcliente.getIdByCorreo(correo);
-            int servicioid = Integer.parseInt(parametros.get(0));
-
-            if (clienteid != -1 && dservicio.existeServicio(servicioid) ) {// validamos que sea un cliente que sea el q solicita el servicio
-                String shortUrl = parametros.get(1); //"https://maps.app.goo.gl/xZMLQNyxDjfBj6MR9";
-                String expandedUrl = expandUrl(shortUrl);
-                System.out.println("Expanded URL: " + expandedUrl);
-                String[] coords = extractCoordinates(expandedUrl);
-                LocalDateTime fechaHoraActual = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String fechaHorasolicitud= fechaHoraActual.format(formatter);
-
-                double lat1 = Double.parseDouble(coords[0].split(",")[0]);
-                double lon1 = Double.parseDouble(coords[0].split(",")[1]);
-                double lat2 = Double.parseDouble(coords[1].split(",")[0]);
-                double lon2 = Double.parseDouble(coords[1].split(",")[1]);
-                double tarifaBase = 5.0; // Tarifa base en Bs
-                double tarifaPorKilometro = 4.50; // Tarifa por kilómetro en Bs
-                double costoAdicional = 2.0; // Costos adicionales en Bs
-                double tarifa = calcularTarifa(lat1, lon1, lat2, lon2, tarifaBase, tarifaPorKilometro, costoAdicional);
-                // aqui vamos a validar las promociones (descuentos)
-                setTarifa(tarifa);
-                 //System.out.println("La tarifa del servicio es: " + tarifa);
-                dSolicitarServicio.solicitarServicio(
-                                            fechaHorasolicitud,//fecha 
-                                            (float)tarifa,//costo del viaje
-                                            coords[0],//origen
-                                            coords[1],// destino
-                                            //parametros.get(3),//tipo de servicio con o sin reserva
-                                            clienteid,//id cliente
-                                            servicioid,//id servicio                                       
-                                            conductor,
-                                            shortUrl
-                                            );
-                dSolicitarServicio.Disconnect();   
-            }
-        }else{
-            System.err.println("No se encuentra ningun conductor");
-        }
-        //creartransaccion(idsolicitud,monto,idmetodo)
-    }
-    
-    
     // estoy usando este para viajes sin reservas 
-    public int idRegistrarSolicitud(List<String> parametros, String correo) throws SQLException, ParseException, Exception {
-        int clienteid = dcliente.getIdByCorreo(correo);
-        int servicioid = Integer.parseInt(parametros.get(0));
-       // System.out.println("Entró aquí");
-        if (clienteid != -1 && dservicio.existeServicio(servicioid)) {
-            //System.out.println("paso la validacion");
-            int conductor = elegirConductor();
-            if (conductor != -1) {
-                String shortUrl = parametros.get(1);
-                String expandedUrl = expandUrl(shortUrl);
-                System.out.println("Expanded URL: " + expandedUrl);
-                String[] coords = extractCoordinates(expandedUrl);
-                LocalDateTime fechaHoraActual = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String fechaHorasolicitud = fechaHoraActual.format(formatter);
+   public int idRegistrarSolicitud(List<String> parametros, String correo) throws SQLException, ParseException, Exception {
+    int clienteid = dcliente.getIdByCorreo(correo);
+    int servicioid = Integer.parseInt(parametros.get(0));
+    final int idMetodoPagoEfectivo = 1; // ID del método de pago "Efectivo" compartido
 
-                double lat1 = Double.parseDouble(coords[0].split(",")[0]);
-                double lon1 = Double.parseDouble(coords[0].split(",")[1]);
-                double lat2 = Double.parseDouble(coords[1].split(",")[0]);
-                double lon2 = Double.parseDouble(coords[1].split(",")[1]);
-                double tarifaBase = 5.0;
-                double tarifaPorKilometro = 4.50;
-                double costoAdicional = 2.0;
-                double tarifa = calcularTarifa(lat1, lon1, lat2, lon2, tarifaBase, tarifaPorKilometro, costoAdicional);
-                setTarifa(tarifa);
+    if (clienteid != -1 && dservicio.existeServicio(servicioid)) {
+      
+        int conductor = elegirConductor();
+        if (conductor != -1) {
+            //String CorreoConductor = dConductor.getCorreoById(conductor);
+            String shortUrl = parametros.get(1);
+            String expandedUrl = expandUrl(shortUrl);
+            System.out.println("Expanded URL: " + expandedUrl);
+            String[] coords = extractCoordinates(expandedUrl);
+            LocalDateTime fechaHoraActual = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String fechaHorasolicitud = fechaHoraActual.format(formatter);
 
-                int idSolicitud = dSolicitarServicio.idSolicitarServicio(
-                                            fechaHorasolicitud,
-                                            (float)tarifa,
-                                            coords[0],
-                                            coords[1],
-                                            clienteid,
-                                            servicioid,
-                                            conductor,
-                                            shortUrl
-                                        );
-                dSolicitarServicio.Disconnect();
-                return idSolicitud;
-            } else {
-                System.err.println("No se encuentra ningun conductor");
-            }
+            double lat1 = Double.parseDouble(coords[0].split(",")[0]);
+            double lon1 = Double.parseDouble(coords[0].split(",")[1]);
+            double lat2 = Double.parseDouble(coords[1].split(",")[0]);
+            double lon2 = Double.parseDouble(coords[1].split(",")[1]);
+            double tarifaBase = 5.0;
+            double tarifaPorKilometro = 4.50;
+            double costoAdicional = 2.0;
+            double tarifa = calcularTarifa(lat1, lon1, lat2, lon2, tarifaBase, tarifaPorKilometro, costoAdicional);
+           
+
+            int idSolicitud = dSolicitarServicio.idSolicitarServicio(
+                                        fechaHorasolicitud,
+                                        (float)tarifa,
+                                        coords[0],
+                                        coords[1],
+                                        clienteid,
+                                        servicioid,
+                                        conductor,
+                                        shortUrl
+                                    );
+            
+            dtransaccion.guardar(idSolicitud, fechaHorasolicitud, (float)tarifa, "pendiente",idMetodoPagoEfectivo);// por defecto pagar con efectivo
+           
+            dSolicitarServicio.Disconnect();
+
+            // Enviar correo al cliente
+            String[] datosVehiculo = dConductor.obtenerDatosVehiculo(conductor);
+            String mensajeCliente = String.format("Se encontró un conductor con el vehículo %s %s, placa %s. La tarifa es de %.2f Bs.",
+                                                  datosVehiculo[1], datosVehiculo[0], datosVehiculo[2], tarifa);
+            simpleNotifySuccess(correo, mensajeCliente);
+
+            // Enviar correo al conductor
+            String correoConductor = dConductor.getCorreoById(conductor);
+            String mensajeConductor = String.format("Se le ha asignado un nuevo cliente. La tarifa del servicio es de %.2f Bs. El cliente tiene el correo %s." + "<br> Ruta:"+" "+ shortUrl
+                    +"<br> Codigo Del Viaje:  " + idSolicitud,
+                                                    tarifa, correo);
+            simpleNotifySuccess(correoConductor, mensajeConductor);
+
+            return idSolicitud;
+        } else {
+            //System.err.println("No se encuentra ningun conductor");
+            simpleNotifySuccess(correo, "Lo sentimos, no hay conductores disponibles.");
         }
-        return -1; // Indica que no se pudo registrar la solicitud
     }
+    return -1; // Indica que no se pudo registrar la solicitud
+}
+
     
     public void reservarSolicitud(List<String> parametros, String correo) throws SQLException, ParseException, Exception {
         
@@ -171,7 +147,7 @@ public class NSolicitarServicio {
             double costoAdicional = 2.0; // Costos adicionales en Bs
             double tarifa = calcularTarifa(lat1, lon1, lat2, lon2, tarifaBase, tarifaPorKilometro, costoAdicional);
             // aqui vamos a validar las promociones (descuentos)
-            setTarifa(tarifa);
+            
              //System.out.println("La tarifa del servicio es: " + tarifa);
             dSolicitarServicio.reservarServicio(
                                         fechaHorasolicitud,//fecha 
@@ -239,8 +215,7 @@ public class NSolicitarServicio {
             dConductor.actualizarEstado(idConductor, "ocupado");
             return idConductor;
         } 
-        // Manejar el caso en que no se encontró ningún conductor libre
-        System.err.println("No hay conductores disponibles en este momento.");
+       
         return -1;
         
     }
@@ -255,6 +230,73 @@ public class NSolicitarServicio {
         
         return idConductor;
     }
+     public Integer idBuscarCliente(int idRegistrarSolicitud){
+        int idConductor = -1;
+        try {
+            idConductor = dSolicitarServicio.obtenerIdCliente(idRegistrarSolicitud);
+        } catch (SQLException ex) {
+            Logger.getLogger(NSolicitarServicio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return idConductor;
+    }
     
+   
+    private void simpleNotifySuccess(String email, String message) {
+    Email emailObject = new Email(email, Email.SUBJECT, HtmlBuilder.generarText(new String[]{
+        "Petición realizada correctamente",
+        message
+    }));
+    sendEmail(emailObject);
+}
+
+    private void sendEmail(Email email) {
+        SendEmailThread sendEmail = new SendEmailThread(email);
+        Thread thread = new Thread(sendEmail);
+        thread.setName("Send email Thread");
+        thread.start();
+    }  
+    
+    // NSolicitarServicio.java
+
+public void finalizarViaje(String correoConductor) throws SQLException {
+    
+        // Obtener el ID del conductor por su correo
+        int idConductor = dConductor.getIdByCorreo(correoConductor);
+
+        if (idConductor != -1) {
+            // Obtener la solicitud pendiente para este conductor
+            int idSolicitud = dSolicitarServicio.obtenerSolicitudPendientePorConductor(idConductor);
+
+            if (idSolicitud != -1) {
+                
+                dSolicitarServicio.actualizarEstadoSolicitudDeServicio(idSolicitud, "completado");//se  finaliza el servicio
+               
+                dConductor.actualizarEstado(idConductor,"libre");//se libera el estado del conductor 
+                
+                // Obtener el correo del cliente asociado a la solicitud
+                int idCliente = dSolicitarServicio.obtenerIdCliente(idSolicitud);
+                String correoCliente = dcliente.getCorreoById(idCliente);
+                    
+                // Enviar un correo al cliente preguntando cómo desea pagar su viaje
+                String mensajeCliente = String.format(
+                    "Su viaje ha sido completado. El código del viaje es: "+ "<br>"+"  %d. " + "<br>"+
+                    "Por favor, indique cómo desea pagar su viaje: " + "<br>"+
+                    "1. Efectivo  " +"<br>"+
+                    "2. Tarjeta de crédito  " +"<br>"+
+                    "Responda a este correo con la opción de pago que prefiera.",
+                    idSolicitud
+                );
+                simpleNotifySuccess(correoCliente, mensajeCliente);
+            } else {
+                simpleNotifySuccess(correoConductor, "No hay solicitudes pendientes");
+                //System.out.println("No hay solicitudes pendientes para este conductor.");
+            }
+        } else {
+            System.out.println("No se encontró un conductor con ese correo.");
+        }
+
+   
+}
 
 }

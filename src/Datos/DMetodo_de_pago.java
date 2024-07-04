@@ -22,29 +22,20 @@ public class DMetodo_de_pago {
      private final  sqlconnection connection;
 
     public DMetodo_de_pago() {
-        this.connection = new sqlconnection(
-                "postgres",
-                "admin", 
-                "127.0.0.1",
-                "5432", "db_tecno");
-        
+       this.connection = new sqlconnection(
+                "grupo04sc",
+                "grup004grup004", 
+                "mail.tecnoweb.org.bo",
+                "5432", "db_grupo04sc");
     }
+    
     // cuando la connecion sea distinto de null se podra hacer la desconeccion a la base de datos 
     public void Disconnect(){
         if( connection!= null ){
             connection.closeConnection();
         }
     }
-    public void guardarMetodoEfectivo(int idCliente) throws SQLException, ParseException {
-        String query = "INSERT INTO metodo_de_pago (tipo_de_metodo_de_pago, id_cliente) VALUES (?, ?)";
-        PreparedStatement ps = connection.connect().prepareStatement(query);
-        ps.setString(1, "Efectivo");
-        ps.setInt(2, idCliente);
-
-        if (ps.executeUpdate() == 0) {
-            System.err.println("Class DMetodo_de_pago.java: Ocurrió un error al insertar un método de pago en guardarMetodoEfectivo()");
-        }
-    }
+   
     public void guardar(String tipoMetodoPago, String numeroTarjeta, String nombreTarjeta, String fechaVencimiento, Integer cvvCvc, int idCliente) throws SQLException, ParseException {
         String query = "INSERT INTO metodo_de_pago (tipo_de_metodo_de_pago, numero_tarjeta, nombre_en_la_tarjeta, fecha_vencimiento, cvv_cvc, id_cliente) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = connection.connect().prepareStatement(query);
@@ -135,5 +126,19 @@ public class DMetodo_de_pago {
         }
 
         return metodoPago;
+    }
+    
+    
+    public boolean perteneceAlCliente(int idMetodoPago, int idCliente) throws SQLException {
+        String query = "SELECT COUNT(*) FROM metodo_de_pago WHERE id = ? AND id_cliente = ?";
+        PreparedStatement ps = connection.connect().prepareStatement(query);
+        ps.setInt(1, idMetodoPago);
+        ps.setInt(2, idCliente);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
     }
 }
